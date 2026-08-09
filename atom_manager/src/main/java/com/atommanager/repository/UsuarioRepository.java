@@ -2,21 +2,20 @@ package com.atommanager.repository;
 
 import com.atommanager.model.Usuario;
 
+import java.util.List;
+
 /**
- * Contrato de acceso a datos de {@link Usuario}.
- *
- * <p>SOLID-D (inversión de dependencias): {@code UsuarioService} depende de
- * esta interfaz, no de una implementación concreta. SOLID-I (segregación de
- * interfaces): contrato específico para usuarios, separado de
- * {@code TareaRepository}.</p>
- *
- * <p>Miembros a implementar:</p>
- * <ul>
- *   <li>{@code void guardar(Usuario usuario)}</li>
- *   <li>{@code Usuario buscarPorId(String id)}</li>
- *   <li>{@code List<Usuario> listarTodos()}</li>
- *   <li>{@code boolean existe(String id)}</li>
- * </ul>
+ * Contrato de acceso a datos de {@link Usuario} (HU-01, HU-02).
+ * SOLID-D: {@code UsuarioService} depende de esta interfaz, no de la
+ * implementación concreta.
  */
 public interface UsuarioRepository {
+
+    void guardar(Usuario usuario);
+
+    Usuario buscarPorId(String id);
+
+    List<Usuario> listarTodos();
+
+    boolean existe(String id);
 }

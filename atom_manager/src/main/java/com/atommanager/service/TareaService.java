@@ -1,25 +1,82 @@
 package com.atommanager.service;
 
+import com.atommanager.model.Prioridad;
+import com.atommanager.model.Tarea;
+import com.atommanager.model.Usuario;
 import com.atommanager.repository.TareaRepository;
+import com.atommanager.repository.UsuarioRepository;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Reglas de negocio para tareas: creación, asignación, prioridad, estado y
- * ordenamiento mediante {@code PriorityQueue} (sección 4.2).
- *
- * <p>SOLID-D (inversión de dependencias): depende de la interfaz
- * {@link TareaRepository}; la implementación concreta se inyecta desde
- * {@code Main}. SOLID-O (abierto/cerrado): nuevas formas de ordenar tareas
- * se agregan con un nuevo {@code Comparator<Tarea>}, sin modificar esta
- * clase.</p>
- *
- * <p>Miembros a implementar:</p>
- * <ul>
- *   <li>{@code TareaRepository tareaRepository} (inyectado por constructor).</li>
- *   <li>{@code crearTarea(...)} (RF-03, RF-04, RF-05, RF-15, HU-04).</li>
- *   <li>{@code asignarTarea(String tareaId, String usuarioId)} (RF-06, HU-05).</li>
- *   <li>{@code cambiarPrioridad(...)}, {@code cambiarEstado(...)} (RF-07 a RF-10, HU-06, HU-08).</li>
- *   <li>{@code Queue<Tarea> tareasPorPrioridad(String usuarioId)} (RF-11, HU-03).</li>
- * </ul>
+ * Reglas de negocio de la Épica 2 (HU-04 a HU-07) y de HU-03 (Épica 1).
+ * Depende de {@link TareaRepository} y {@link UsuarioRepository} por
+ * constructor (SOLID-D): necesita el segundo para validar que el
+ * responsable de HU-05 exista.
  */
 public class TareaService {
+
+    private final TareaRepository tareaRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final AtomicInteger contadorId = new AtomicInteger(0);
+
+    public TareaService(TareaRepository tareaRepository, UsuarioRepository usuarioRepository) {
+        this.tareaRepository = tareaRepository;
+        this.usuarioRepository = usuarioRepository;
+    }
+
+    /** HU-04: crea una tarea con id único autogenerado; el título obligatorio lo valida {@link Tarea}. */
+    public Tarea crearTarea(String titulo, String descripcion, Prioridad prioridad) {
+        String id = "T-" + contadorId.incrementAndGet();
+        Tarea tarea = new Tarea(id, titulo, descripcion, prioridad);
+        tareaRepository.guardar(tarea);
+        return tarea;
+    }
+
+    /** HU-05: asigna una tarea a un usuario ya registrado. */
+    public void asignarTarea(String tareaId, String usuarioId) {
+        Tarea tarea = obtenerTareaOLanzar(tareaId);
+        Usuario usuario = usuarioRepository.buscarPorId(usuarioId);
+        if (usuario == null) {
+            throw new IllegalArgumentException("No existe un usuario con el id \"" + usuarioId + "\".");
+        }
+        tarea.setResponsable(usuario);
+    }
+
+    /** HU-06: cambia la prioridad de una tarea existente. */
+    public void cambiarPrioridad(String tareaId, Prioridad prioridad) {
+        obtenerTareaOLanzar(tareaId).setPrioridad(prioridad);
+    }
+
+    /** HU-07: lista todas las tareas registradas. */
+    public List<Tarea> listarTareas() {
+        return tareaRepository.listarTodas();
+    }
+
+    /** HU-03: tareas de un usuario ordenadas de mayor a menor prioridad, vía PriorityQueue. */
+    public List<Tarea> tareasPorPrioridad(String usuarioId) {
+        Queue<Tarea> cola = new PriorityQueue<>(
+                Comparator.comparingInt(tarea -> tarea.getPrioridad().getPeso())
+        );
+        cola.addAll(tareaRepository.buscarPorUsuario(usuarioId));
+
+        List<Tarea> ordenadas = new ArrayList<>();
+        while (!cola.isEmpty()) {
+            ordenadas.add(cola.poll());
+        }
+        return ordenadas;
+    }
+
+    private Tarea obtenerTareaOLanzar(String tareaId) {
+        Tarea tarea = tareaRepository.buscarPorId(tareaId);
+        if (tarea == null) {
+            throw new IllegalArgumentException("No existe una tarea con el id \"" + tareaId + "\".");
+        }
+        return tarea;
+    }
 }

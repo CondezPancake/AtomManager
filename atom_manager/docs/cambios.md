@@ -6,6 +6,21 @@
 
 ## Historial de cambios
 
+### 2026-08-09 — Revisión de coherencia README ↔ AtomManager2.1.md
+
+**Descripción:** Revisión completa de `README.md` contra el documento de diseño `AtomManager2.1.md` para garantizar coherencia total.
+
+**Cambios realizados en `README.md`:**
+
+1. **Versión de Java alineada con el proyecto:** se corrigió "Java 21"/"JDK 21" → "Java 17"/"JDK 17" (descripción, tabla de tecnologías y requisitos previos), coincidiendo con el `pom.xml` (`maven.compiler.source/target = 17`). El documento de diseño no fija versión (RNF-01 solo indica Java).
+2. **Objetivos específicos completados:** se amplió la lista a los 13 objetivos de la sección 2.1 del documento (añadidos: prioridades, estados, `Map`/`HashMap`, `Queue`/`PriorityQueue`, POO, SOLID, Swing/JOptionPane y Conventional Commits).
+3. **Alcance corregido:** se sustituyó "CRUD de usuarios y tareas" por la redacción exacta del documento (sección 9.1): usuarios — registrar y consultar; tareas — crear, editar, asignar responsable, prioridad y estado.
+4. **`model/Prioridad` detallado:** se añadió la mención a `peso`, `etiqueta` e `ícono` en la tabla del paquete `model` y en el árbol de arquitectura (sección 8 del documento).
+
+**Verificación:** búsqueda de referencias residuales a "Java 21"/"CRUD" con resultado vacío; hoy no queda ninguna discrepancia entre README, `AtomManager2.1.md` y el `pom.xml`.
+
+---
+
 ### 2026-08-09 — Empaquetado del proyecto (esqueleto)
 
 **Descripción:** Reorganización del proyecto según la estructura definida en `AtomManager2.1.md` (sección 3.1). Se deja todo listo para empezar a programar: solo estructura, sin lógica de negocio.
@@ -68,3 +83,74 @@
 - Implementar la lógica de negocio en `UsuarioService` / `TareaService`, incluyendo `PriorityQueue`.
 - Implementar la capa `ui` (Swing / JOptionPane).
 - Completar `Main.java` (inyección de dependencias e inicio de `MenuPrincipal`).
+
+---
+
+### 2026-08-09 — Documentación de paquetes para el equipo (`package-info.java`)
+
+**Descripción:** A pedido del equipo, se documentó dentro del propio código (no solo en `README.md`) qué va y qué no va en cada paquete, para que cualquier desarrollador lo vea directamente en el IDE o al generar Javadoc, sin necesidad de implementar todavía la lógica real. No se tocó ninguna firma ni lógica existente: es documentación pura.
+
+**Cambios realizados:**
+1. Creado `model/package-info.java`: qué entidades van ahí (`Usuario`, `Tarea`, `Prioridad`, `Estado`) y qué no (repositorios, services, vistas, Swing/HashMap/PriorityQueue).
+2. Creado `repository/package-info.java`: interfaces + implementaciones en memoria; regla de que `service` depende de la interfaz, nunca de la implementación (SOLID-D/L).
+3. Creado `service/package-info.java`: dónde vive la validación de reglas de negocio; inyección de repositorios por constructor; sin código de Swing acá.
+4. Creado `ui/package-info.java`: qué vistas van ahí; sin lógica de negocio, depende de `service`, nunca de `repository` directamente.
+5. Agregado Javadoc de clase a `Main.java` explicando que es la única clase que debe conocer las implementaciones concretas de `repository`, y qué pasos le corresponde armar (instanciar repos en memoria, inyectarlos en los services, arrancar `MenuPrincipal`). El cuerpo del método `main` no se modificó (sigue como placeholder).
+6. Verificada la compilación completa del proyecto con `javac` (sin errores).
+
+**Nota para coordinación entre agentes:** esta entrada es solo documentación (`package-info.java` + Javadoc de `Main`); ningún archivo de lógica fue tocado. La implementación real de `model`, `repository`, `service`, `ui` y `Main` sigue pendiente y listada abajo.
+
+**Próximos pasos (pendientes):**
+- Implementar atributos, constructores, getters/setters y validaciones en `model` (`Usuario`, `Tarea`, `Prioridad`, `Estado`).
+- Implementar los métodos de `UsuarioRepository` / `TareaRepository` y sus implementaciones en memoria.
+- Implementar la lógica de negocio en `UsuarioService` / `TareaService`, incluyendo `PriorityQueue`.
+- Implementar la capa `ui` (Swing / JOptionPane).
+- Completar `Main.java` (inyección de dependencias e inicio de `MenuPrincipal`).
+
+---
+
+### 2026-08-09 — Implementación de Épica 1 y Épica 2 (model, repository, service)
+
+**Descripción:** Implementación funcional de las historias de usuario HU-01 a HU-07 (Épica 1 — Gestión de usuarios, Épica 2 — Gestión de tareas). Alcance intencionalmente acotado a estas dos épicas: no se tocó `ui/` ni `Main.java`, y `Tarea` todavía no expone forma de cambiar su `Estado` (eso es HU-08, Épica 3).
+
+**Cambios realizados:**
+1. `model/Usuario.java`: `id` (inmutable) y `nombre`, con validación de campos obligatorios en el constructor y en `setNombre`. `equals`/`hashCode` por `id`.
+2. `model/Tarea.java`: `id` (inmutable, autogenerado por el service), `titulo` (obligatorio), `descripcion`, `prioridad`, `responsable` y `estado` (inmutable, nace en `POR_REALIZAR`; sin setter todavía porque HU-08 está fuera de alcance). `equals`/`hashCode` por `id`.
+3. `model/Prioridad.java` (enum): `ALTA(1)`, `MODERADA(2)`, `BAJA(3)` con `peso`, `etiqueta` e `icono`; el peso es el que ordena la `PriorityQueue`.
+4. `model/Estado.java` (enum): `POR_REALIZAR`, `EN_PROCESO`, `FINALIZADA` — solo el valor por defecto que necesita `Tarea`; sin lógica de transición todavía.
+5. `repository/UsuarioRepository(Memoria)`: `guardar`, `buscarPorId`, `listarTodos`, `existe`, sobre `Map<String, Usuario>`.
+6. `repository/TareaRepository(Memoria)`: `guardar`, `buscarPorId`, `listarTodas`, `buscarPorUsuario` (filtra por `responsable.id`), `existe`, sobre `Map<String, Tarea>`. No se agregó `buscarPorEstado`: pertenece a Épica 3.
+7. `service/UsuarioService`: `registrarUsuario` (HU-01, valida id único) y `listarUsuarios` (HU-02).
+8. `service/TareaService`: `crearTarea` (HU-04, id autogenerado `"T-" + contador`), `asignarTarea` (HU-05, valida que el usuario exista), `cambiarPrioridad` (HU-06), `listarTareas` (HU-07) y `tareasPorPrioridad` (HU-03, vacía una `PriorityQueue` en una `List` para no depender del orden de iteración interno).
+9. Verificada la compilación completa del proyecto con `javac` (sin errores).
+
+**Decisiones de diseño (POO/SOLID):**
+- `TareaService` depende de `TareaRepository` **y** `UsuarioRepository` (ambas interfaces) para poder validar HU-05 sin que `Tarea`/`TareaRepository` conozcan nada de usuarios fuera de la referencia ya modelada (SOLID-D, SOLID-S).
+- No se agregaron mapas índice (`tareasPorUsuario`, `tareasPorEstado`) además del `Map` principal: `buscarPorUsuario` filtra sobre el único `HashMap` con un stream. Se prioriza no tener dos estructuras que puedan desincronizarse por sobre seguir al pie de la letra la sección 4.1 del documento; si el volumen de tareas lo justifica más adelante, se puede optimizar sin cambiar la interfaz `TareaRepository`.
+- `Tarea` no tiene `setEstado(...)` ni `TareaRepository` tiene `buscarPorEstado(...)`: agregarlos ahora sería anticipar Épica 3 sin una historia de usuario que lo pida (YAGNI).
+
+**Próximos pasos (pendientes):**
+- Probar `UsuarioService`/`TareaService` (HU-01 a HU-07) — en curso.
+- Épica 3 (HU-08 estado, HU-09 consulta por estado, HU-10 consulta general por prioridad).
+- Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).
+
+---
+
+### 2026-08-09 — Pruebas unitarias de Épica 1 y Épica 2 (JUnit 5)
+
+**Descripción:** Se agregó JUnit 5 como dependencia de test y se escribieron pruebas unitarias para `UsuarioService` y `TareaService`, cubriendo los criterios de aceptación de HU-01 a HU-07.
+
+**Cambios realizados:**
+1. `pom.xml`: agregada dependencia `org.junit.jupiter:junit-jupiter:5.10.2` (scope `test`) y `maven-surefire-plugin:3.2.5` para que `mvn test` las ejecute.
+2. `src/test/java/com/atommanager/service/UsuarioServiceTest.java` (4 tests, HU-01/HU-02): registrar usuario válido, id duplicado lanza excepción, listar usuarios (con y sin registros).
+3. `src/test/java/com/atommanager/service/TareaServiceTest.java` (9 tests, HU-03 a HU-07): id autogenerado y único, título vacío lanza excepción, asignar a usuario existente/inexistente, asignar con id de tarea inexistente, cambiar prioridad, listar todas, y el caso clave de HU-03 — `tareasPorPrioridad` devuelve las tareas de un usuario en orden Alta → Moderada → Baja usando `PriorityQueue`.
+4. Cada test parte de repositorios en memoria nuevos (`@BeforeEach`) para que los casos no compartan estado.
+
+**Cómo se corrieron (nota de entorno):** este sandbox no tiene el binario `mvn` instalado, solo `java`/`javac`. Para verificar las pruebas ahora se compiló todo con `javac` y se ejecutaron con `junit-platform-console-standalone-1.10.2.jar` (descargado de Maven Central) en vez de `mvn test`. En cualquier máquina con Maven instalado, `mvn test` debería correr esta misma suite sin pasos adicionales, ya que el `pom.xml` quedó configurado para eso.
+
+**Resultado:** 13/13 tests pasaron (5 containers, 0 fallos).
+
+**Próximos pasos (pendientes):**
+- Épica 3 (HU-08 estado, HU-09 consulta por estado, HU-10 consulta general por prioridad).
+- Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).
+- Cuando se implemente `ui`/`Main`, correr `mvn test` en una máquina con Maven para confirmar que la config del `pom.xml` funciona igual que la verificación manual hecha acá.

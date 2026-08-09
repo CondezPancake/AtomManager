@@ -1,20 +1,41 @@
 package com.atommanager.model;
 
 /**
- * Niveles de prioridad de las tareas (RF-07, RF-08).
+ * Niveles de prioridad de una tarea (HU-06, RF-07, RF-08).
  *
- * <p>Menor peso = mayor urgencia (usado por {@code PriorityQueue}):</p>
- * <ul>
- *   <li>{@code ALTA(1)} — 🔴 actividad crítica.</li>
- *   <li>{@code MODERADA(2)} — 🟡 actividad importante.</li>
- *   <li>{@code BAJA(3)} — 🟢 actividad menor.</li>
- * </ul>
- *
- * <p>Miembros a implementar:</p>
- * <ul>
- *   <li>Atributo {@code peso} (int), {@code etiqueta} (String) e {@code icono} (String).</li>
- *   <li>Constructor y getters ({@code getPeso()}, etc.).</li>
- * </ul>
+ * <p>Menor peso = mayor urgencia; el peso es el que usa
+ * {@code TareaService} para ordenar la {@code PriorityQueue} (HU-03).</p>
  */
 public enum Prioridad {
+
+    ALTA(1, "Alta", "🔴"),
+    MODERADA(2, "Moderada", "🟡"),
+    BAJA(3, "Baja", "🟢");
+
+    private final int peso;
+    private final String etiqueta;
+    private final String icono;
+
+    Prioridad(int peso, String etiqueta, String icono) {
+        this.peso = peso;
+        this.etiqueta = etiqueta;
+        this.icono = icono;
+    }
+
+    public int getPeso() {
+        return peso;
+    }
+
+    public String getEtiqueta() {
+        return etiqueta;
+    }
+
+    public String getIcono() {
+        return icono;
+    }
+
+    @Override
+    public String toString() {
+        return icono + " " + etiqueta;
+    }
 }

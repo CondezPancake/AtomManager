@@ -2,18 +2,36 @@ package com.atommanager.repository;
 
 import com.atommanager.model.Usuario;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- * Implementación en memoria de {@link UsuarioRepository} usando un
+ * Implementación en memoria de {@link UsuarioRepository} con
  * {@code HashMap} como almacén principal (sección 4.1).
- *
- * <p>SOLID-L (sustitución de Liskov): cualquier otra implementación de
- * {@code UsuarioRepository} (por ejemplo, un futuro repositorio en archivo)
- * puede reemplazar a esta sin romper {@code UsuarioService}.</p>
- *
- * <p>Miembros a implementar:</p>
- * <ul>
- *   <li>{@code Map<String, Usuario> usuarios = new HashMap<>();}</li>
- * </ul>
  */
 public class UsuarioRepositoryMemoria implements UsuarioRepository {
+
+    private final Map<String, Usuario> usuarios = new HashMap<>();
+
+    @Override
+    public void guardar(Usuario usuario) {
+        usuarios.put(usuario.getId(), usuario);
+    }
+
+    @Override
+    public Usuario buscarPorId(String id) {
+        return usuarios.get(id);
+    }
+
+    @Override
+    public List<Usuario> listarTodos() {
+        return new ArrayList<>(usuarios.values());
+    }
+
+    @Override
+    public boolean existe(String id) {
+        return usuarios.containsKey(id);
+    }
 }

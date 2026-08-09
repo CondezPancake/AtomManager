@@ -2,22 +2,23 @@ package com.atommanager.repository;
 
 import com.atommanager.model.Tarea;
 
+import java.util.List;
+
 /**
- * Contrato de acceso a datos de {@link Tarea}.
- *
- * <p>SOLID-D (inversión de dependencias): {@code TareaService} depende de
- * esta interfaz, no de una implementación concreta. SOLID-I (segregación de
- * interfaces): contrato específico para tareas, separado de
- * {@code UsuarioRepository}.</p>
- *
- * <p>Miembros a implementar:</p>
- * <ul>
- *   <li>{@code void guardar(Tarea tarea)}</li>
- *   <li>{@code Tarea buscarPorId(String id)}</li>
- *   <li>{@code List<Tarea> listarTodas()}</li>
- *   <li>{@code List<Tarea> buscarPorUsuario(String usuarioId)}</li>
- *   <li>{@code List<Tarea> buscarPorEstado(Estado estado)}</li>
- * </ul>
+ * Contrato de acceso a datos de {@link Tarea} (HU-03 a HU-07).
+ * SOLID-D: {@code TareaService} depende de esta interfaz, no de la
+ * implementación concreta.
  */
 public interface TareaRepository {
+
+    void guardar(Tarea tarea);
+
+    Tarea buscarPorId(String id);
+
+    List<Tarea> listarTodas();
+
+    /** Tareas asignadas a un usuario (base de HU-03). */
+    List<Tarea> buscarPorUsuario(String usuarioId);
+
+    boolean existe(String id);
 }

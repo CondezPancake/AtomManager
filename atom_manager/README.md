@@ -1,6 +1,6 @@
 # AtomManager
 
-Gestor de tareas de escritorio inspirado en herramientas como Jira y Trello, desarrollado en **Java 21** aplicando Programación Orientada a Objetos y los principios **SOLID**.
+Gestor de tareas de escritorio inspirado en herramientas como Jira y Trello, desarrollado en **Java 17** aplicando Programación Orientada a Objetos y los principios **SOLID**.
 
 > ⚠️ **Estado actual: en desarrollo (esqueleto inicial).** La estructura de paquetes está definida pero la lógica de negocio y la interfaz gráfica todavía no están implementadas. Consultá [`docs/cambios.md`](docs/cambios.md) para ver el registro de avances.
 
@@ -35,18 +35,25 @@ Desarrollar un gestor de tareas que permita a un equipo de trabajo organizar, as
 
 **Objetivos específicos:**
 
-- Crear y consultar usuarios.
-- Crear y administrar tareas (título, descripción, responsable, prioridad, estado).
-- Asignar tareas a usuarios existentes.
-- Consultar las tareas de un usuario ordenadas por prioridad.
-- Visualizar tareas agrupadas por estado (tipo tablero).
-- Aplicar POO y SOLID en el diseño del sistema.
+- Crear usuarios dentro del sistema.
+- Crear y administrar tareas.
+- Asignar tareas a usuarios.
+- Definir prioridades para las tareas (Alta, Moderada, Baja).
+- Gestionar el estado de las tareas (Por realizar, En proceso, Finalizada).
+- Consultar las tareas asignadas a cada usuario **ordenadas por prioridad**.
+- Visualizar las tareas agrupadas por estado.
+- Utilizar `Map` y `HashMap` como almacén principal de datos en memoria.
+- Utilizar la interfaz `Queue` (`PriorityQueue`) para el ordenamiento por prioridad.
+- Modelar el sistema aplicando POO (encapsulamiento, abstracción, enums, interfaces).
+- Aplicar los principios SOLID en la separación de responsabilidades.
+- Desarrollar la interfaz gráfica con Swing / JOptionPane.
+- Utilizar GitHub para el trabajo colaborativo con Conventional Commits.
 
 ## Tecnologías
 
 | Categoría | Tecnología |
 | --- | --- |
-| Lenguaje | Java 21 |
+| Lenguaje | Java 17 |
 | Build tool | Maven |
 | Interfaz gráfica | Swing / JOptionPane (opcionalmente [FlatLaf](https://www.formdev.com/flatlaf/)) |
 | Estructuras de datos | `HashMap`, `Queue` (`PriorityQueue`) |
@@ -62,7 +69,7 @@ com.atommanager
 ├── model/            → Entidades del dominio: solo datos, sin lógica ni dependencias de otros paquetes.
 │   ├── Usuario        → id, nombre.
 │   ├── Tarea           → id, titulo, descripcion, prioridad, estado, responsable (Usuario).
-│   ├── Prioridad (enum) → ALTA(1), MODERADA(2), BAJA(3).
+│   ├── Prioridad (enum) → ALTA(1), MODERADA(2), BAJA(3), con peso, etiqueta e ícono.
 │   └── Estado (enum)    → POR_REALIZAR, EN_PROCESO, FINALIZADA.
 │
 ├── repository/       → Acceso a datos: interfaces + implementación en memoria (HashMap).
@@ -98,7 +105,7 @@ Contiene únicamente las clases de datos del dominio: no tienen lógica de negoc
 | --- | --- | --- |
 | `Usuario` | Clase | Representa un integrante del proyecto: `id`, `nombre`. |
 | `Tarea` | Clase | Representa una actividad: `id`, `titulo`, `descripcion`, `prioridad` (`Prioridad`), `estado` (`Estado`), `responsable` (`Usuario`). |
-| `Prioridad` | Enum | Niveles de prioridad de una tarea: `ALTA(1)`, `MODERADA(2)`, `BAJA(3)`. El peso numérico es el que ordena la `PriorityQueue`. |
+| `Prioridad` | Enum | Niveles de prioridad de una tarea: `ALTA(1)`, `MODERADA(2)`, `BAJA(3)`, cada constante con `peso`, `etiqueta` e `ícono`. El peso numérico es el que ordena la `PriorityQueue`. |
 | `Estado` | Enum | Ciclo de vida de una tarea: `POR_REALIZAR`, `EN_PROCESO`, `FINALIZADA`. |
 
 #### `com.atommanager.repository`
@@ -189,7 +196,7 @@ colaAtencion.addAll(tareasDelUsuario);
 
 ## Alcance del proyecto
 
-**Dentro del alcance:** CRUD de usuarios y tareas, asignación de responsables, prioridades, estados, vistas por usuario/estado/prioridad, e interfaz Swing / JOptionPane.
+**Dentro del alcance:** usuarios (registrar y consultar); tareas (crear, editar, asignar responsable, prioridad y estado); consultas por usuario ordenadas por prioridad, por estado (tipo tablero) y por prioridad; e interfaz Swing / JOptionPane.
 
 **Fuera del alcance (por ahora):** JavaFX, persistencia obligatoria en JSON, integración con Jira/Trello, app móvil, chat interno, notificaciones, calendario avanzado, autenticación externa, roles avanzados, API REST, bases de datos SQL y despliegue en la nube.
 
@@ -197,7 +204,7 @@ La persistencia de datos (guardar/cargar al cerrar la app) queda como funcionali
 
 ## Cómo compilar y ejecutar
 
-Requisitos previos: **JDK 21** y **Maven** instalados.
+Requisitos previos: **JDK 17** y **Maven** instalados.
 
 ```bash
 # Compilar el proyecto
