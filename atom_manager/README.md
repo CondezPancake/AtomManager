@@ -2,7 +2,7 @@
 
 Gestor de tareas de escritorio inspirado en herramientas como Jira y Trello, desarrollado en **Java 17** aplicando Programación Orientada a Objetos y los principios **SOLID**.
 
-> ⚠️ **Estado actual: en desarrollo (esqueleto inicial).** La estructura de paquetes está definida pero la lógica de negocio y la interfaz gráfica todavía no están implementadas. Consultá [`docs/cambios.md`](docs/cambios.md) para ver el registro de avances.
+> ⚠️ **Estado actual: en desarrollo.** La lógica de usuarios, tareas y cambio de estado está implementada; faltan las consultas de HU-09/HU-10 y la interfaz gráfica. Consultá [`docs/cambios.md`](docs/cambios.md) para ver el registro de avances.
 
 ---
 
@@ -233,7 +233,7 @@ atom_manager/
 │   ├── model/
 │   │   ├── package-info.java      → qué va y qué no va en este paquete
 │   │   ├── Usuario.java           → integrante del proyecto — implementado
-│   │   ├── Tarea.java             → actividad del proyecto — implementado (sin cambio de estado aún, ver Épica 3)
+│   │   ├── Tarea.java             → actividad del proyecto — implementado (incluye cambio de estado, HU-08)
 │   │   ├── Prioridad.java         → enum ALTA, MODERADA, BAJA — implementado
 │   │   └── Estado.java            → enum POR_REALIZAR, EN_PROCESO, FINALIZADA — implementado
 │   ├── repository/

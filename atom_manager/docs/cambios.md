@@ -6,6 +6,28 @@
 
 ## Historial de cambios
 
+### 2026-08-09 — Implementación de HU-08 (cambio de estado de tareas)
+
+**Descripción:** Se implementó la historia de usuario HU-08 de la Épica 3: cambiar el estado de una tarea existente.
+
+**Cambios realizados:**
+
+1. `model/Tarea.java`: el atributo `estado` deja de ser inmutable y se agregó `setEstado(Estado)`. El setter valida que el estado no sea nulo y lanza `IllegalArgumentException` si se intenta asignar uno inválido.
+2. `service/TareaService.java`: se agregó `cambiarEstado(String tareaId, Estado estado)`. Reutiliza la validación existente de tarea por ID y delega la validación de estado al modelo.
+3. `src/test/.../TareaServiceTest.java`: se agregaron pruebas para cambiar una tarea a `EN_PROCESO` y `FINALIZADA`, intentar cambiar el estado de una tarea inexistente y pasar un estado nulo.
+4. `README.md` y `docs/GUIA-PROXIMO-DESARROLLADOR.md`: se actualizó el estado de avance; HU-09 (consulta agrupada por estado) sigue pendiente.
+
+**Decisiones de diseño:**
+- Se permiten cambios entre cualquiera de los tres valores del enum, incluido retroceder de estado, tal como permite el documento de diseño.
+- HU-09 y HU-10 no se implementaron: son historias independientes que requieren consultas nuevas en la capa `repository` y `service`.
+
+**Próximos pasos (pendientes):**
+- HU-09: consultar tareas agrupadas por estado.
+- HU-10: consultar todas las tareas ordenadas por prioridad.
+- Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).
+
+---
+
 ### 2026-08-09 — Revisión de coherencia README ↔ AtomManager2.1.md
 
 **Descripción:** Revisión completa de `README.md` contra el documento de diseño `AtomManager2.1.md` para garantizar coherencia total.

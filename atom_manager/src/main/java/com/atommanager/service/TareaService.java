@@ -1,5 +1,6 @@
 package com.atommanager.service;
 
+import com.atommanager.model.Estado;
 import com.atommanager.model.Prioridad;
 import com.atommanager.model.Tarea;
 import com.atommanager.model.Usuario;
@@ -14,7 +15,8 @@ import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Reglas de negocio de la Épica 2 (HU-04 a HU-07) y de HU-03 (Épica 1).
+ * Reglas de negocio de la Épica 2 (HU-04 a HU-07), HU-03 (Épica 1) y
+ * HU-08 (Épica 3).
  * Depende de {@link TareaRepository} y {@link UsuarioRepository} por
  * constructor (SOLID-D): necesita el segundo para validar que el
  * responsable de HU-05 exista.
@@ -51,6 +53,11 @@ public class TareaService {
     /** HU-06: cambia la prioridad de una tarea existente. */
     public void cambiarPrioridad(String tareaId, Prioridad prioridad) {
         obtenerTareaOLanzar(tareaId).setPrioridad(prioridad);
+    }
+
+    /** HU-08: cambia el estado de una tarea existente. */
+    public void cambiarEstado(String tareaId, Estado estado) {
+        obtenerTareaOLanzar(tareaId).setEstado(estado);
     }
 
     /** HU-07: lista todas las tareas registradas. */

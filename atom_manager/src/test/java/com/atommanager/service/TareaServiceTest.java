@@ -19,7 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Épica 2 — Gestión de tareas (HU-04 a HU-07) y HU-03 (Épica 1).
+ * Épica 2 — Gestión de tareas (HU-04 a HU-07), HU-03 (Épica 1) y
+ * HU-08 (Épica 3).
  */
 class TareaServiceTest {
 
@@ -86,6 +87,30 @@ class TareaServiceTest {
         tareaService.cambiarPrioridad(tarea.getId(), Prioridad.ALTA);
 
         assertEquals(Prioridad.ALTA, tarea.getPrioridad());
+    }
+
+    @Test
+    void cambiarEstado_actualizaElEstadoDeLaTarea() {
+        Tarea tarea = tareaService.crearTarea("Tarea 1", "desc", Prioridad.BAJA);
+
+        tareaService.cambiarEstado(tarea.getId(), Estado.EN_PROCESO);
+        tareaService.cambiarEstado(tarea.getId(), Estado.FINALIZADA);
+
+        assertEquals(Estado.FINALIZADA, tarea.getEstado());
+    }
+
+    @Test
+    void cambiarEstado_conIdDeTareaInexistente_lanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class,
+                () -> tareaService.cambiarEstado("no-existe", Estado.EN_PROCESO));
+    }
+
+    @Test
+    void cambiarEstado_conEstadoNulo_lanzaExcepcion() {
+        Tarea tarea = tareaService.crearTarea("Tarea 1", "desc", Prioridad.BAJA);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> tareaService.cambiarEstado(tarea.getId(), null));
     }
 
     @Test
