@@ -222,3 +222,57 @@ Esto deja una inconsistencia real entre `pom.xml` y `README.md` sobre qué versi
 - Definir si el proyecto usa Java 17 o Java 21, y alinear `pom.xml` y `README.md` entre sí (hoy están en desacuerdo).
 - Épica 3 (HU-08 estado, HU-09 consulta por estado, HU-10 consulta general por prioridad).
 - Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).
+
+---
+
+### 2026-08-09 — Comentarios de paquete en lenguaje simple
+
+**Descripción:** Se reescribieron los 4 `package-info.java` (`model`, `repository`, `service`, `ui`) porque el equipo los encontró poco claros: usaban códigos como "SOLID-S"/"SOLID-D"/"SOLID-L" y referencias a secciones del documento de diseño (RF-17, sección 4.1/4.2) sin explicar qué significaban en la práctica.
+
+**Cambios realizados:** mismo contenido y ubicación de cada uno, pero explicado en español simple: qué hay en la carpeta, qué NO va ahí, y por qué está organizado así, sin siglas ni referencias a números de requisito. Se mantiene el mismo tono que `docs/GUIA-PROXIMO-DESARROLLADOR.md`.
+
+**Verificación:** `mvn test` — sigue compilando y las 13 pruebas siguen pasando (son comentarios, no cambia ningún comportamiento).
+
+**Próximos pasos (pendientes):**
+- Definir si el proyecto usa Java 17 o Java 21, y alinear `pom.xml` y `README.md` entre sí (hoy están en desacuerdo).
+- Épica 3 (HU-08 estado, HU-09 consulta por estado, HU-10 consulta general por prioridad).
+- Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).
+
+---
+
+### 2026-08-09 — Main.java: primera interfaz de usuario (terminal)
+
+**Descripción:** A pedido del equipo, se va a interactuar con la Épica 1 y la Épica 2 en tres etapas progresivas: primero por terminal, después con `JOptionPane`, y por último con Swing (más una cuarta etapa opcional con JavaFX, fuera del alcance oficial del documento de diseño, como ejercicio extra). Se decidió que las tres/cuatro etapas van a vivir todas en `Main.java`, reemplazando cada una a la anterior — no van a convivir varias interfaces sueltas en el proyecto.
+
+**Cambios realizados:**
+1. `Main.java` completado: arma las dependencias (`UsuarioRepositoryMemoria`, `TareaRepositoryMemoria`, `UsuarioService`, `TareaService`) y levanta un menú por consola con `Scanner`.
+2. El menú cubre las 7 historias de usuario implementadas: registrar usuario, consultar usuarios, crear tarea, asignar tarea, cambiar prioridad, consultar todas las tareas, y consultar las tareas de un usuario ordenadas por prioridad.
+3. Los errores de negocio (`IllegalArgumentException` que tiran los `service`, por ejemplo id duplicado o usuario inexistente) se atrapan en el menú y se muestran como mensaje, sin cortar el programa.
+
+**Verificación:** se corrió el programa de punta a punta simulando una sesión completa (registrar usuario → crear tarea → asignar → cambiar prioridad → consultar) y también los casos de error (id duplicado, tarea inexistente, opción de menú inválida): todo responde como se espera, sin excepciones sin atrapar. `mvn test` sigue en 13/13.
+
+**Próximos pasos (pendientes):**
+- Reemplazar el menú de `Main.java` por una versión con `JOptionPane`.
+- Después, reemplazar esa versión por una con Swing (ventanas con `JFrame`).
+- Como ejercicio extra fuera de alcance: una versión con JavaFX, actualizando `AtomManager2.1.md` para reflejar esa decisión cuando se llegue a esa etapa.
+- Épica 3 (HU-08 estado, HU-09 consulta por estado, HU-10 consulta general por prioridad).
+
+---
+
+### 2026-08-09 — Definido: el proyecto usa Java 17 (cierra la inconsistencia pendiente)
+
+**Descripción:** Al correr `MainPruebas.java` desde el IDE apareció `UnsupportedClassVersionError`: el IDE ejecuta con `java-17-openjdk` (class file version 61), pero `pom.xml` compilaba para Java 21 (class file version 65). Esto es la misma inconsistencia Java 17/README vs Java 21/`pom.xml` que quedaba pendiente desde hace varias entradas — recién ahora se manifestó como error real, no solo como discrepancia en la documentación.
+
+**Decisión:** el proyecto queda en **Java 17**. Motivos: (1) es lo que el IDE del usuario ejecuta por defecto — hay JDK 17, 21 y 26 instalados en la máquina, y el `java` con el que corre el botón "Run" del IDE es el 17; (2) el código no usa ninguna característica exclusiva de Java 21 o superior (se revisó: sin `record`, `sealed`, pattern matching en `switch`, etc.) — todo compila y corre igual en 17; (3) es lo que ya decía `README.md` desde que el usuario lo dejó así explícitamente en una sesión anterior.
+
+**Cambios realizados:**
+1. `pom.xml`: `maven.compiler.source`/`target` de `21` a `17`.
+2. `mvn clean test`: recompilado desde cero, `.class` ahora en major version 61 (Java 17).
+3. Verificado corriendo `MainPruebas` directamente con `/usr/lib/jvm/java-17-openjdk/bin/java` (el mismo binario del error original): ya no tira `UnsupportedClassVersionError`.
+4. `mvn test`: 13/13, sin cambios de comportamiento.
+
+**Próximos pasos (pendientes):**
+- Reemplazar el menú de `Main.java` por una versión con `JOptionPane`.
+- Después, reemplazar esa versión por una con Swing (ventanas con `JFrame`).
+- Como ejercicio extra fuera de alcance: una versión con JavaFX, actualizando `AtomManager2.1.md` para reflejar esa decisión cuando se llegue a esa etapa.
+- Épica 3 (HU-08 estado, HU-09 consulta por estado, HU-10 consulta general por prioridad).

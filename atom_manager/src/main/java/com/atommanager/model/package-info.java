@@ -1,20 +1,24 @@
 /**
- * Entidades del dominio de AtomManager.
+ * Acá van las "fichas" de datos del sistema: usuarios, tareas, prioridades y estados.
  *
- * <p>Solo contiene clases de datos ({@code Usuario}, {@code Tarea}) y enums
- * ({@code Prioridad}, {@code Estado}): atributos privados con getters/setters
- * y validaciones propias. No depende de ningún otro paquete del proyecto ni
- * contiene lógica de negocio ni de acceso a datos (SOLID-S).</p>
+ * <p>Estas clases solo guardan información y se fijan que tenga sentido (por
+ * ejemplo, que una tarea no se pueda crear sin título). No saben nada de cómo
+ * se guarda esa información en la memoria, ni de las reglas del negocio, ni
+ * de las pantallas.</p>
  *
- * <p>Qué va acá:</p>
+ * <p>Qué hay en esta carpeta:</p>
  * <ul>
- *   <li>{@code Usuario} — integrante del proyecto (id, nombre).</li>
- *   <li>{@code Tarea} — actividad del proyecto (id, titulo, descripcion, prioridad, estado, responsable).</li>
- *   <li>{@code Prioridad} (enum) — ALTA, MODERADA, BAJA.</li>
- *   <li>{@code Estado} (enum) — POR_REALIZAR, EN_PROCESO, FINALIZADA.</li>
+ *   <li>{@code Usuario}: una persona del proyecto (tiene un id y un nombre).</li>
+ *   <li>{@code Tarea}: una actividad del proyecto (tiene un id, un título, una
+ *   descripción, una prioridad, un estado y, si ya se asignó, el usuario
+ *   responsable).</li>
+ *   <li>{@code Prioridad}: qué tan urgente es una tarea (Alta, Moderada o Baja).</li>
+ *   <li>{@code Estado}: en qué punto está una tarea (Por realizar, En proceso
+ *   o Finalizada).</li>
  * </ul>
  *
- * <p>Qué NO va acá: repositorios, services ni vistas, ni ninguna clase que
- * dependa de Swing, {@code HashMap} o {@code PriorityQueue}.</p>
+ * <p>Qué NO va en esta carpeta: nada que guarde información en un
+ * {@code HashMap} o en un archivo, nada de pantallas, y nada que decida si
+ * una acción "se puede hacer" o no — eso va en la carpeta {@code service}.</p>
  */
 package com.atommanager.model;

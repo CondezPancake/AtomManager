@@ -1,18 +1,21 @@
 /**
- * Capa de presentación de AtomManager, implementada con Swing / JOptionPane
- * (RF-17).
+ * Acá van las pantallas del programa: lo que ve y con lo que interactúa la
+ * persona que usa AtomManager (hechas con ventanas simples de Java,
+ * {@code JOptionPane}).
  *
- * <p>Qué va acá:</p>
+ * <p>Qué hay en esta carpeta:</p>
  * <ul>
- *   <li>{@code MenuPrincipal} — menú de arranque, navega hacia las demás vistas.</li>
- *   <li>{@code VistaUsuarios} — pantallas de alta y listado de usuarios.</li>
- *   <li>{@code VistaTareas} — pantallas de alta, asignación y consulta de tareas.</li>
+ *   <li>{@code MenuPrincipal}: el menú de arranque, desde donde se llega a
+ *   las demás pantallas.</li>
+ *   <li>{@code VistaUsuarios}: las pantallas para registrar y ver usuarios.</li>
+ *   <li>{@code VistaTareas}: las pantallas para crear, asignar y consultar
+ *   tareas.</li>
  * </ul>
  *
- * <p>Reglas de diseño:</p>
- * <ul>
- *   <li>Sin lógica de negocio ni validaciones de dominio: solo pide datos, invoca al {@code service} correspondiente y muestra el resultado (SOLID-S).</li>
- *   <li>Depende de {@code UsuarioService} / {@code TareaService} (paquete {@code service}), nunca de {@code repository} directamente.</li>
- * </ul>
+ * <p>Regla importante: las pantallas de acá no deciden nada por su cuenta.
+ * Solo le piden datos a la persona, se los pasan a la carpeta
+ * {@code service}, y muestran lo que {@code service} les devuelve (el
+ * resultado, o el mensaje de error si algo salió mal). Toda la parte
+ * "inteligente" ya está resuelta en {@code service}.</p>
  */
 package com.atommanager.ui;

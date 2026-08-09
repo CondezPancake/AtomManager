@@ -14,18 +14,15 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Punto de entrada de la aplicación AtomManager.
+ * Copia de {@link Main} para probar a mano por terminal, corriéndola vos
+ * mismo desde el IDE (clic derecho → Run) o con
+ * {@code mvn exec:java -Dexec.mainClass="com.atommanager.MainPruebas"}.
  *
- * <p>Fase actual: menú por terminal, para poder probar a mano la Épica 1
- * (usuarios) y la Épica 2 (tareas) sin necesidad de una pantalla gráfica
- * todavía. Más adelante este mismo método va a arrancar la versión con
- * {@code JOptionPane} y, después, la versión con Swing.</p>
- *
- * <p>Es la única clase del proyecto que instancia las implementaciones
- * concretas de {@code repository} (las que guardan en memoria) y las
- * conecta con los {@code service} correspondientes.</p>
+ * <p>Es un archivo temporal: existe solo para no arriesgar {@code Main.java}
+ * mientras se prueban funcionalidades. Se borra cuando se termine de probar
+ * la fase de terminal.</p>
  */
-public class Main {
+public class MainPruebas {
 
     public static void main(String[] args) {
         UsuarioRepository usuarioRepository = new UsuarioRepositoryMemoria();
@@ -47,7 +44,7 @@ public class Main {
 
     private static void mostrarMenu() {
         System.out.println();
-        System.out.println("===== AtomManager =====");
+        System.out.println("===== AtomManager (PRUEBAS) =====");
         System.out.println("1. Registrar usuario");
         System.out.println("2. Consultar usuarios");
         System.out.println("3. Crear tarea");

@@ -1,19 +1,27 @@
 /**
- * Reglas de negocio de AtomManager: validaciones, asignación de tareas,
- * cambios de prioridad/estado y ordenamiento por prioridad con
- * {@code PriorityQueue} (sección 4.2 del documento de diseño).
+ * Acá viven las reglas del negocio: qué se puede hacer y qué no.
  *
- * <p>Qué va acá:</p>
+ * <p>Por ejemplo: "no se puede registrar dos usuarios con el mismo id", "no
+ * se puede asignar una tarea a alguien que no existe", "las tareas de un
+ * usuario se muestran ordenadas de la más urgente a la menos urgente".</p>
+ *
+ * <p>Qué hay en esta carpeta:</p>
  * <ul>
- *   <li>{@code UsuarioService} — registrar/listar usuarios, validar ID único.</li>
- *   <li>{@code TareaService} — crear/asignar tareas, cambiar prioridad/estado, construir la cola de prioridad.</li>
+ *   <li>{@code UsuarioService}: registrar y listar usuarios, validando que
+ *   el id no esté repetido.</li>
+ *   <li>{@code TareaService}: crear y asignar tareas, cambiar su prioridad,
+ *   listarlas, y ordenarlas por prioridad (de más a menos urgente) usando
+ *   una {@code PriorityQueue}.</li>
  * </ul>
  *
- * <p>Reglas de diseño:</p>
- * <ul>
- *   <li>Cada service recibe su(s) repositorio(s) por constructor (inyección de dependencias, SOLID-D); nunca instancia {@code UsuarioRepositoryMemoria} / {@code TareaRepositoryMemoria} directamente.</li>
- *   <li>Acá vive toda la validación de reglas del dominio (ids únicos, campos obligatorios, existencia de usuario/tarea antes de operar).</li>
- *   <li>Sin código de Swing/JOptionPane: la capa {@code ui} es la única que sabe cómo se presenta la información.</li>
- * </ul>
+ * <p>Cómo funciona por dentro: cada clase de acá recibe, al crearse, el
+ * repositorio que necesita (por ejemplo, {@code UsuarioService} recibe un
+ * {@code UsuarioRepository}) — nunca crea uno por su cuenta. Así, si el día
+ * de mañana cambia cómo se guardan los datos, esta carpeta no se entera ni
+ * hay que tocarla.</p>
+ *
+ * <p>Qué NO va en esta carpeta: nada de pantallas ni de {@code JOptionPane}
+ * — eso lo pide y lo muestra la carpeta {@code ui}; acá solo se deciden las
+ * reglas.</p>
  */
 package com.atommanager.service;
