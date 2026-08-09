@@ -203,3 +203,22 @@ Esto deja una inconsistencia real entre `pom.xml` y `README.md` sobre qué versi
 - Definir si el proyecto usa Java 17 o Java 21, y alinear `pom.xml` y `README.md` entre sí (hoy están en desacuerdo).
 - Épica 3 (HU-08 estado, HU-09 consulta por estado, HU-10 consulta general por prioridad).
 - Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).
+
+---
+
+### 2026-08-09 — Merge con `origin/developer` y push
+
+**Descripción:** Al hacer `git push origin developer` el remoto rechazó el push porque tenía un commit que no estaba en el historial local: `2b06c46 "Feature H01 User Register Task and User"`, de `CondezPancake`, del 6 de agosto (anterior a toda esta sesión de trabajo) — nunca se había hecho `git pull` de ese commit.
+
+**Qué tenía ese commit:** solo creaba `model/Tarea.java` y `model/Usuario.java` vacíos (`public class Tarea {}` / `public class Usuario {}`), el punto de partida exacto sobre el que se construyó después toda la implementación de Épica 1 y 2 en esta sesión.
+
+**Resolución:** `git merge origin/developer` marcó conflicto tipo "add/add" en esos dos archivos (ambas ramas los "crearon" de forma independiente desde una base donde no existían). Se resolvió quedándose con la versión completa e implementada (la de esta sesión) y descartando el stub vacío. También el merge reintrodujo dos `.class` de `target/` que el commit remoto tenía trackeados; se sacaron de nuevo del índice con `git rm --cached -f`, coherente con la limpieza de `target/`/`.gitignore` de la entrada anterior.
+
+**Verificación:** `mvn test` después del merge — `BUILD SUCCESS`, 13/13 pruebas, sin cambios de comportamiento.
+
+**Nota para coordinación entre agentes/colaboradores:** este es el primer caso concreto de historias de git realmente divergentes (no solo archivos desactualizados en el mismo árbol de trabajo). Antes de cualquier `git push` a una rama compartida, conviene `git fetch` primero para detectar esto antes de que lo rechace el remoto.
+
+**Próximos pasos (pendientes):**
+- Definir si el proyecto usa Java 17 o Java 21, y alinear `pom.xml` y `README.md` entre sí (hoy están en desacuerdo).
+- Épica 3 (HU-08 estado, HU-09 consulta por estado, HU-10 consulta general por prioridad).
+- Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).
