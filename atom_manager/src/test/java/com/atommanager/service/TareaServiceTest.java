@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -19,7 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Épica 2 — Gestión de tareas (HU-04 a HU-07) y HU-03 (Épica 1).
+ * Épica 2 — Gestión de tareas (HU-04 a HU-07), HU-03 (Épica 1) y
+ * HU-08 a HU-10 (Épica 3).
  */
 class TareaServiceTest {
 
@@ -89,11 +91,61 @@ class TareaServiceTest {
     }
 
     @Test
+    void cambiarEstado_actualizaElEstadoDeLaTarea() {
+        Tarea tarea = tareaService.crearTarea("Tarea 1", "desc", Prioridad.BAJA);
+
+        tareaService.cambiarEstado(tarea.getId(), Estado.EN_PROCESO);
+        tareaService.cambiarEstado(tarea.getId(), Estado.FINALIZADA);
+
+        assertEquals(Estado.FINALIZADA, tarea.getEstado());
+    }
+
+    @Test
+    void cambiarEstado_conIdDeTareaInexistente_lanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class,
+                () -> tareaService.cambiarEstado("no-existe", Estado.EN_PROCESO));
+    }
+
+    @Test
+    void cambiarEstado_conEstadoNulo_lanzaExcepcion() {
+        Tarea tarea = tareaService.crearTarea("Tarea 1", "desc", Prioridad.BAJA);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> tareaService.cambiarEstado(tarea.getId(), null));
+    }
+
+    @Test
     void listarTareas_devuelveTodasLasCreadas() {
         tareaService.crearTarea("Tarea 1", "desc", Prioridad.ALTA);
         tareaService.crearTarea("Tarea 2", "desc", Prioridad.BAJA);
 
         assertEquals(2, tareaService.listarTareas().size());
+    }
+
+    @Test
+    void tareasPorEstado_lasAgrupaEnLasTresColumnas() {
+        Tarea porRealizar = tareaService.crearTarea("Por realizar", "desc", Prioridad.BAJA);
+        Tarea enProceso = tareaService.crearTarea("En proceso", "desc", Prioridad.MODERADA);
+        Tarea finalizada = tareaService.crearTarea("Finalizada", "desc", Prioridad.ALTA);
+        tareaService.cambiarEstado(enProceso.getId(), Estado.EN_PROCESO);
+        tareaService.cambiarEstado(finalizada.getId(), Estado.FINALIZADA);
+
+        Map<Estado, List<Tarea>> agrupadas = tareaService.tareasPorEstado();
+
+        assertEquals(List.of(porRealizar), agrupadas.get(Estado.POR_REALIZAR));
+        assertEquals(List.of(enProceso), agrupadas.get(Estado.EN_PROCESO));
+        assertEquals(List.of(finalizada), agrupadas.get(Estado.FINALIZADA));
+    }
+
+    @Test
+    void tareasPorEstado_sinTareas_devuelveLasTresColumnasVacias() {
+        Map<Estado, List<Tarea>> agrupadas = tareaService.tareasPorEstado();
+
+        assertEquals(3, agrupadas.size());
+        assertTrue(agrupadas.containsKey(Estado.POR_REALIZAR));
+        assertTrue(agrupadas.containsKey(Estado.EN_PROCESO));
+        assertTrue(agrupadas.containsKey(Estado.FINALIZADA));
+        assertTrue(agrupadas.values().stream().allMatch(List::isEmpty));
     }
 
     @Test
@@ -114,5 +166,21 @@ class TareaServiceTest {
     @Test
     void tareasPorPrioridad_deUsuarioSinTareas_devuelveListaVacia() {
         assertTrue(tareaService.tareasPorPrioridad("sin-tareas").isEmpty());
+    }
+
+    @Test
+    void tareasPorPrioridad_general_lasOrdenaDeAltaABaja() {
+        Tarea baja = tareaService.crearTarea("Baja", "desc", Prioridad.BAJA);
+        Tarea alta = tareaService.crearTarea("Alta", "desc", Prioridad.ALTA);
+        Tarea moderada = tareaService.crearTarea("Moderada", "desc", Prioridad.MODERADA);
+
+        List<Tarea> ordenadas = tareaService.tareasPorPrioridad();
+
+        assertEquals(List.of(alta, moderada, baja), ordenadas);
+    }
+
+    @Test
+    void tareasPorPrioridad_general_sinTareas_devuelveListaVacia() {
+        assertTrue(tareaService.tareasPorPrioridad().isEmpty());
     }
 }

@@ -1,12 +1,12 @@
 package com.atommanager.model;
 
 /**
- * Ciclo de vida de una tarea (Épica 3, fuera de alcance por ahora).
+ * Ciclo de vida de una tarea (Épica 3, HU-08).
  *
  * <p>Toda {@link Tarea} necesita un estado válido desde que se crea, por
  * eso el enum ya existe: nace en {@code POR_REALIZAR} (ver constructor de
- * {@code Tarea}). Las historias de usuario que permiten cambiarlo
- * (HU-08) y consultarlo agrupado (HU-09) todavía no están implementadas.</p>
+ * {@code Tarea}). HU-08 permite cambiarlo; la consulta agrupada de HU-09
+ * todavía no está implementada.</p>
  */
 public enum Estado {
 

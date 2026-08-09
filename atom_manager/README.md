@@ -2,7 +2,7 @@
 
 Gestor de tareas de escritorio inspirado en herramientas como Jira y Trello, desarrollado en **Java 17** aplicando Programación Orientada a Objetos y los principios **SOLID**.
 
-> ⚠️ **Estado actual: en desarrollo (esqueleto inicial).** La estructura de paquetes está definida pero la lógica de negocio y la interfaz gráfica todavía no están implementadas. Consultá [`docs/cambios.md`](docs/cambios.md) para ver el registro de avances.
+> ⚠️ **Estado actual: en desarrollo.** La lógica de usuarios y tareas está implementada; falta la interfaz gráfica para usarla como aplicación de escritorio. Consultá [`docs/cambios.md`](docs/cambios.md) para ver el registro de avances.
 
 ---
 
@@ -117,7 +117,7 @@ Encapsula el acceso a los datos en memoria. Cada entidad tiene una interfaz pequ
 | `UsuarioRepository` | Interfaz | Contrato de acceso a datos de `Usuario` (guardar, buscar por ID, listar, verificar existencia). |
 | `TareaRepository` | Interfaz | Contrato de acceso a datos de `Tarea` (guardar, buscar por ID, listar, filtrar por usuario/estado). |
 | `UsuarioRepositoryMemoria` | Clase | Implementa `UsuarioRepository` con `Map<String, Usuario>`. |
-| `TareaRepositoryMemoria` | Clase | Implementa `TareaRepository` con `Map<String, Tarea>` y los índices auxiliares por usuario y por estado. |
+| `TareaRepositoryMemoria` | Clase | Implementa `TareaRepository` con `Map<String, Tarea>` y consultas por usuario y por estado. |
 
 #### `com.atommanager.service`
 
@@ -126,7 +126,7 @@ Contiene las reglas de negocio: validaciones, asignación de tareas, cambios de 
 | Tipo | Kind | Responsabilidad |
 | --- | --- | --- |
 | `UsuarioService` | Clase | Registrar y listar usuarios; valida que el ID sea único antes de guardar. |
-| `TareaService` | Clase | Crear/editar tareas, asignar responsable, cambiar prioridad y estado, y construir la `PriorityQueue` de tareas por usuario. |
+| `TareaService` | Clase | Crear/editar tareas, asignar responsable, cambiar prioridad y estado, y ordenar tareas por prioridad para un usuario o de forma general. |
 
 #### `com.atommanager.ui`
 
@@ -233,7 +233,7 @@ atom_manager/
 │   ├── model/
 │   │   ├── package-info.java      → qué va y qué no va en este paquete
 │   │   ├── Usuario.java           → integrante del proyecto — implementado
-│   │   ├── Tarea.java             → actividad del proyecto — implementado (sin cambio de estado aún, ver Épica 3)
+│   │   ├── Tarea.java             → actividad del proyecto — implementado (incluye cambio de estado, HU-08)
 │   │   ├── Prioridad.java         → enum ALTA, MODERADA, BAJA — implementado
 │   │   └── Estado.java            → enum POR_REALIZAR, EN_PROCESO, FINALIZADA — implementado
 │   ├── repository/

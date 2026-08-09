@@ -3,14 +3,13 @@ package com.atommanager.model;
 import java.util.Objects;
 
 /**
- * Actividad del proyecto (HU-04 a HU-07). Clase de datos: sin lógica de
+ * Actividad del proyecto (HU-04 a HU-08). Clase de datos: sin lógica de
  * negocio (eso vive en {@code TareaService}), solo encapsulamiento y
  * validación de sus propios invariantes. Composición: referencia al
  * {@link Usuario} responsable.
  *
- * <p>No expone {@code setEstado(...)} todavía: el cambio de estado es
- * HU-08 (Épica 3), fuera de alcance por ahora. La tarea nace en
- * {@code Estado.POR_REALIZAR}.</p>
+ * <p>La tarea nace en {@code Estado.POR_REALIZAR}; su estado puede cambiarse
+ * mediante {@code setEstado(...)} para cumplir HU-08 (Épica 3).</p>
  */
 public class Tarea {
 
@@ -18,7 +17,7 @@ public class Tarea {
     private String titulo;
     private String descripcion;
     private Prioridad prioridad;
-    private final Estado estado;
+    private Estado estado;
     private Usuario responsable;
 
     public Tarea(String id, String titulo, String descripcion, Prioridad prioridad) {
@@ -72,6 +71,13 @@ public class Tarea {
 
     public Estado getEstado() {
         return estado;
+    }
+
+    public void setEstado(Estado estado) {
+        if (estado == null) {
+            throw new IllegalArgumentException("El estado no puede ser nulo.");
+        }
+        this.estado = estado;
     }
 
     public Usuario getResponsable() {

@@ -1,5 +1,6 @@
 package com.atommanager.service;
 
+import com.atommanager.model.Estado;
 import com.atommanager.model.Prioridad;
 import com.atommanager.model.Tarea;
 import com.atommanager.model.Usuario;
@@ -8,13 +9,16 @@ import com.atommanager.repository.UsuarioRepository;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Reglas de negocio de la Épica 2 (HU-04 a HU-07) y de HU-03 (Épica 1).
+ * Reglas de negocio de la Épica 2 (HU-04 a HU-07), HU-03 (Épica 1) y
+ * HU-08 a HU-10 (Épica 3).
  * Depende de {@link TareaRepository} y {@link UsuarioRepository} por
  * constructor (SOLID-D): necesita el segundo para validar que el
  * responsable de HU-05 exista.
@@ -53,17 +57,40 @@ public class TareaService {
         obtenerTareaOLanzar(tareaId).setPrioridad(prioridad);
     }
 
+    /** HU-08: cambia el estado de una tarea existente. */
+    public void cambiarEstado(String tareaId, Estado estado) {
+        obtenerTareaOLanzar(tareaId).setEstado(estado);
+    }
+
     /** HU-07: lista todas las tareas registradas. */
     public List<Tarea> listarTareas() {
         return tareaRepository.listarTodas();
     }
 
+    /** HU-09: agrupa las tareas por estado para la vista tipo tablero. */
+    public Map<Estado, List<Tarea>> tareasPorEstado() {
+        Map<Estado, List<Tarea>> tareasAgrupadas = new EnumMap<>(Estado.class);
+        for (Estado estado : Estado.values()) {
+            tareasAgrupadas.put(estado, tareaRepository.buscarPorEstado(estado));
+        }
+        return tareasAgrupadas;
+    }
+
     /** HU-03: tareas de un usuario ordenadas de mayor a menor prioridad, vía PriorityQueue. */
     public List<Tarea> tareasPorPrioridad(String usuarioId) {
+        return ordenarPorPrioridad(tareaRepository.buscarPorUsuario(usuarioId));
+    }
+
+    /** HU-10: todas las tareas ordenadas de mayor a menor prioridad, vía PriorityQueue. */
+    public List<Tarea> tareasPorPrioridad() {
+        return ordenarPorPrioridad(tareaRepository.listarTodas());
+    }
+
+    private List<Tarea> ordenarPorPrioridad(List<Tarea> tareas) {
         Queue<Tarea> cola = new PriorityQueue<>(
                 Comparator.comparingInt(tarea -> tarea.getPrioridad().getPeso())
         );
-        cola.addAll(tareaRepository.buscarPorUsuario(usuarioId));
+        cola.addAll(tareas);
 
         List<Tarea> ordenadas = new ArrayList<>();
         while (!cola.isEmpty()) {
