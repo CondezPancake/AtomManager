@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Reglas de negocio de la Épica 2 (HU-04 a HU-07), HU-03 (Épica 1) y
- * HU-08 y HU-09 (Épica 3).
+ * HU-08 a HU-10 (Épica 3).
  * Depende de {@link TareaRepository} y {@link UsuarioRepository} por
  * constructor (SOLID-D): necesita el segundo para validar que el
  * responsable de HU-05 exista.
@@ -78,10 +78,19 @@ public class TareaService {
 
     /** HU-03: tareas de un usuario ordenadas de mayor a menor prioridad, vía PriorityQueue. */
     public List<Tarea> tareasPorPrioridad(String usuarioId) {
+        return ordenarPorPrioridad(tareaRepository.buscarPorUsuario(usuarioId));
+    }
+
+    /** HU-10: todas las tareas ordenadas de mayor a menor prioridad, vía PriorityQueue. */
+    public List<Tarea> tareasPorPrioridad() {
+        return ordenarPorPrioridad(tareaRepository.listarTodas());
+    }
+
+    private List<Tarea> ordenarPorPrioridad(List<Tarea> tareas) {
         Queue<Tarea> cola = new PriorityQueue<>(
                 Comparator.comparingInt(tarea -> tarea.getPrioridad().getPeso())
         );
-        cola.addAll(tareaRepository.buscarPorUsuario(usuarioId));
+        cola.addAll(tareas);
 
         List<Tarea> ordenadas = new ArrayList<>();
         while (!cola.isEmpty()) {

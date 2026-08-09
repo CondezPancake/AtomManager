@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Épica 2 — Gestión de tareas (HU-04 a HU-07), HU-03 (Épica 1) y
- * HU-08 y HU-09 (Épica 3).
+ * HU-08 a HU-10 (Épica 3).
  */
 class TareaServiceTest {
 
@@ -166,5 +166,21 @@ class TareaServiceTest {
     @Test
     void tareasPorPrioridad_deUsuarioSinTareas_devuelveListaVacia() {
         assertTrue(tareaService.tareasPorPrioridad("sin-tareas").isEmpty());
+    }
+
+    @Test
+    void tareasPorPrioridad_general_lasOrdenaDeAltaABaja() {
+        Tarea baja = tareaService.crearTarea("Baja", "desc", Prioridad.BAJA);
+        Tarea alta = tareaService.crearTarea("Alta", "desc", Prioridad.ALTA);
+        Tarea moderada = tareaService.crearTarea("Moderada", "desc", Prioridad.MODERADA);
+
+        List<Tarea> ordenadas = tareaService.tareasPorPrioridad();
+
+        assertEquals(List.of(alta, moderada, baja), ordenadas);
+    }
+
+    @Test
+    void tareasPorPrioridad_general_sinTareas_devuelveListaVacia() {
+        assertTrue(tareaService.tareasPorPrioridad().isEmpty());
     }
 }

@@ -6,6 +6,27 @@
 
 ## Historial de cambios
 
+### 2026-08-09 — Implementación de HU-10 (consulta general por prioridad)
+
+**Descripción:** Se implementó la historia de usuario HU-10 de la Épica 3: consultar todas las tareas ordenadas de mayor a menor prioridad.
+
+**Cambios realizados:**
+
+1. `service/TareaService.java`: se agregó la sobrecarga `tareasPorPrioridad()` para consultar todas las tareas registradas.
+2. El ordenamiento se extrajo al método privado `ordenarPorPrioridad(List<Tarea>)`, reutilizado por HU-03 y HU-10. El método vacía una `PriorityQueue` para garantizar el orden Alta → Moderada → Baja.
+3. `src/test/.../TareaServiceTest.java`: se agregaron pruebas para el listado general ordenado y para el caso sin tareas.
+4. `README.md` y `docs/GUIA-PROXIMO-DESARROLLADOR.md`: se actualizó el estado de avance.
+
+**Decisiones de diseño:**
+- La sobrecarga sin parámetros mantiene explícita la diferencia entre HU-03 (tareas de un usuario) y HU-10 (todas las tareas), sin crear otro servicio ni duplicar lógica.
+- No se usa el orden de iteración de `PriorityQueue`; las tareas se extraen con `poll()` antes de devolver la lista.
+
+**Próximos pasos (pendientes):**
+- Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).
+- Persistencia opcional si el resto del proyecto está terminado y probado.
+
+---
+
 ### 2026-08-09 — Implementación de HU-09 (consulta de tareas por estado)
 
 **Descripción:** Se implementó la historia de usuario HU-09 de la Épica 3: consultar las tareas agrupadas por estado en una vista tipo tablero.

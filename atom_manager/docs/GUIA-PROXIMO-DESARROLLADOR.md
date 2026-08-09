@@ -23,6 +23,7 @@ Ya está hecho y probado lo siguiente:
 - **Cambiar el estado de una tarea** (Por realizar, En proceso o Finalizada).
 - **Ver todas las tareas** que existen.
 - **Ver las tareas de una persona ordenadas de la más urgente a la menos urgente**.
+- **Ver todas las tareas ordenadas de la más urgente a la menos urgente**.
 
 Todo esto tiene pruebas automáticas, y el proyecto compila sin errores.
 
@@ -105,5 +106,6 @@ Y afuera de esas cuatro carpetas está `Main.java`, que es el botón de arranque
 - ✅ Tareas: crear, asignar, poner prioridad, consultar — **hecho y probado**.
 - ✅ Tareas: cambiar de estado — **hecho y probado**.
 - ✅ Tareas: verlas agrupadas por estado — **hecho y probado**.
+- ✅ Tareas: ver todas ordenadas por prioridad — **hecho y probado**.
 - ⬜ Pantallas del programa y arranque (`ui` + `Main.java`) — **falta**.
 - ⬜ Guardar los datos en un archivo — **falta, no es obligatorio**.

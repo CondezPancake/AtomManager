@@ -2,7 +2,7 @@
 
 Gestor de tareas de escritorio inspirado en herramientas como Jira y Trello, desarrollado en **Java 17** aplicando Programación Orientada a Objetos y los principios **SOLID**.
 
-> ⚠️ **Estado actual: en desarrollo.** La lógica de usuarios, tareas y consultas por estado está implementada; faltan la consulta general por prioridad (HU-10) y la interfaz gráfica. Consultá [`docs/cambios.md`](docs/cambios.md) para ver el registro de avances.
+> ⚠️ **Estado actual: en desarrollo.** La lógica de usuarios y tareas está implementada; falta la interfaz gráfica para usarla como aplicación de escritorio. Consultá [`docs/cambios.md`](docs/cambios.md) para ver el registro de avances.
 
 ---
 
@@ -126,7 +126,7 @@ Contiene las reglas de negocio: validaciones, asignación de tareas, cambios de 
 | Tipo | Kind | Responsabilidad |
 | --- | --- | --- |
 | `UsuarioService` | Clase | Registrar y listar usuarios; valida que el ID sea único antes de guardar. |
-| `TareaService` | Clase | Crear/editar tareas, asignar responsable, cambiar prioridad y estado, y construir la `PriorityQueue` de tareas por usuario. |
+| `TareaService` | Clase | Crear/editar tareas, asignar responsable, cambiar prioridad y estado, y ordenar tareas por prioridad para un usuario o de forma general. |
 
 #### `com.atommanager.ui`
 
