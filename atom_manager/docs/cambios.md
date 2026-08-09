@@ -154,3 +154,52 @@
 - Épica 3 (HU-08 estado, HU-09 consulta por estado, HU-10 consulta general por prioridad).
 - Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).
 - Cuando se implemente `ui`/`Main`, correr `mvn test` en una máquina con Maven para confirmar que la config del `pom.xml` funciona igual que la verificación manual hecha acá.
+
+---
+
+### 2026-08-09 — Guía en lenguaje simple para el próximo desarrollador
+
+**Descripción:** Se creó `docs/GUIA-PROXIMO-DESARROLLADOR.md`, un documento en español simple (sin jerga técnica) que resume: qué funciona hoy (Épica 1 y 2), qué falta (Épica 3, `ui`/`Main`, persistencia opcional), en qué carpeta/archivo va cada cosa pendiente, y cómo correr y agregar pruebas. Pensado para alguien que se suma al proyecto y necesita entender el panorama completo sin tener que reconstruirlo leyendo commit por commit. Se enlazó desde la sección "Documentación" de `README.md`.
+
+**Conflicto de edición detectado (para que quede registrado):** mientras se trabajaba en esta sesión, otro proceso/agente editó `README.md` y `pom.xml` en paralelo:
+- `pom.xml` quedó en **Java 21** (`maven.compiler.source/target`).
+- `README.md` quedó en **Java 17** en sus tres menciones (descripción, tabla de tecnologías, requisitos previos), revertido intencionalmente después de haber sido llevado a 21 en una entrada anterior.
+
+Esto deja una inconsistencia real entre `pom.xml` y `README.md` sobre qué versión de Java usa el proyecto. No se resolvió en esta entrada porque el cambio en `README.md` fue una edición manual explícita durante la sesión (no un error de sincronización), así que corresponde que el equipo defina cuál de las dos versiones es la correcta y alinee el otro archivo, en vez de que un agente lo decida unilateralmente.
+
+**Próximos pasos (pendientes):**
+- Definir si el proyecto usa Java 17 o Java 21, y alinear `pom.xml` y `README.md` entre sí (hoy están en desacuerdo).
+- Épica 3 (HU-08 estado, HU-09 consulta por estado, HU-10 consulta general por prioridad).
+- Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).
+
+---
+
+### 2026-08-09 — Maven instalado y `mvn test` verificado
+
+**Descripción:** Se instaló Apache Maven 3.9.16 en la máquina de desarrollo (antes solo estaban `java`/`javac`, sin `mvn`) y se corrió `mvn test` de punta a punta para confirmar que la suite de tests de la Épica 1 y 2 funciona igual con el flujo estándar de Maven, no solo con el método manual (`junit-platform-console-standalone.jar`) usado en la entrada anterior por falta de Maven en ese momento.
+
+**Resultado:** `BUILD SUCCESS`. `Tests run: 13, Failures: 0, Errors: 0, Skipped: 0` (`UsuarioServiceTest` 4/4, `TareaServiceTest` 9/9). Coincide con el resultado obtenido antes a mano.
+
+**Próximos pasos (pendientes):**
+- Definir si el proyecto usa Java 17 o Java 21, y alinear `pom.xml` y `README.md` entre sí (hoy están en desacuerdo).
+- Épica 3 (HU-08 estado, HU-09 consulta por estado, HU-10 consulta general por prioridad).
+- Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).
+
+---
+
+### 2026-08-09 — Limpieza de la estructura del repositorio
+
+**Descripción:** Auditoría completa de archivos del proyecto a pedido del equipo, porque la carpeta `target/` (generada por Maven al compilar) se había estado versionando por error desde el primer commit — nunca existió un `.gitignore` real, pese a que una entrada muy anterior de este mismo documento decía haberlo agregado.
+
+**Hallazgo:** 20 archivos de `target/` (`.class` compilados, reportes de `surefire`, metadata interna de `maven-compiler-plugin`) estaban trackeados en git. Son artefactos 100% regenerables con `mvn compile` / `mvn test` / `mvn clean`; no aportan nada versionados y generan diffs de ruido cada vez que alguien compila. No se encontró ningún otro archivo sobrante (sin `.class` fuera de `target/`, sin archivos de IDE, sin duplicados).
+
+**Cambios realizados:**
+1. Creado `.gitignore` en la raíz del proyecto: ignora `target/`, carpetas/archivos comunes de IDE (`.idea/`, `*.iml`, `.vscode/`, `.settings/`, `.classpath`, `.project`) y `.DS_Store`.
+2. `git rm -r --cached target`: se sacó `target/` del seguimiento de git. Los archivos siguen en el disco (Maven los necesita para correr), solo dejan de versionarse.
+3. Actualizado el árbol de `README.md` (sección "Estructura del repositorio"): se sacaron las etiquetas `(stub)` de `model`, `repository` y `service` (ya están implementados, quedan solo en `ui`, que sigue pendiente), se agregaron los `package-info.java`, `src/test/`, `.gitignore` y `docs/GUIA-PROXIMO-DESARROLLADOR.md`, que no figuraban.
+4. Verificado con `mvn clean test`: sigue compilando y las 13 pruebas siguen pasando después de la limpieza.
+
+**Próximos pasos (pendientes):**
+- Definir si el proyecto usa Java 17 o Java 21, y alinear `pom.xml` y `README.md` entre sí (hoy están en desacuerdo).
+- Épica 3 (HU-08 estado, HU-09 consulta por estado, HU-10 consulta general por prioridad).
+- Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).

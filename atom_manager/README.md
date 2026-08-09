@@ -219,32 +219,41 @@ mvn package
 
 ## Estructura del repositorio
 
-> El código listado como "stub" ya existe como clase/interfaz vacía con Javadoc (documenta la responsabilidad y los miembros a implementar), pero todavía no tiene lógica. Ver estado real y detallado en [`docs/cambios.md`](docs/cambios.md).
+> `target/` no aparece acá porque no se versiona: es la carpeta que genera Maven al compilar (`.class`, reportes de tests, etc.), se recrea sola con `mvn compile` / `mvn test` y está listada en `.gitignore`.
 
 ```text
 atom_manager/
+├── .gitignore
 ├── docs/
-│   ├── AtomManager2.1.md          → documento de diseño: épicas, historias de usuario, requisitos
-│   └── cambios.md                 → registro histórico de cambios del proyecto
+│   ├── AtomManager2.1.md                  → documento de diseño: épicas, historias de usuario, requisitos
+│   ├── cambios.md                         → registro histórico de cambios del proyecto
+│   └── GUIA-PROXIMO-DESARROLLADOR.md      → qué está hecho, qué falta y dónde tocar, en lenguaje simple
 ├── src/main/java/com/atommanager/
-│   ├── Main.java                  → punto de entrada
+│   ├── Main.java                  → punto de entrada (todavía sin la inyección de dependencias)
 │   ├── model/
-│   │   ├── Usuario.java           → (stub) integrante del proyecto
-│   │   ├── Tarea.java             → (stub) actividad del proyecto
-│   │   ├── Prioridad.java         → (stub, enum) ALTA, MODERADA, BAJA
-│   │   └── Estado.java            → (stub, enum) POR_REALIZAR, EN_PROCESO, FINALIZADA
+│   │   ├── package-info.java      → qué va y qué no va en este paquete
+│   │   ├── Usuario.java           → integrante del proyecto — implementado
+│   │   ├── Tarea.java             → actividad del proyecto — implementado (sin cambio de estado aún, ver Épica 3)
+│   │   ├── Prioridad.java         → enum ALTA, MODERADA, BAJA — implementado
+│   │   └── Estado.java            → enum POR_REALIZAR, EN_PROCESO, FINALIZADA — implementado
 │   ├── repository/
-│   │   ├── UsuarioRepository.java         → (stub, interfaz) contrato de acceso a usuarios
-│   │   ├── TareaRepository.java           → (stub, interfaz) contrato de acceso a tareas
-│   │   ├── UsuarioRepositoryMemoria.java  → (stub) implementación en memoria con HashMap
-│   │   └── TareaRepositoryMemoria.java    → (stub) implementación en memoria con HashMap
+│   │   ├── package-info.java              → qué va y qué no va en este paquete
+│   │   ├── UsuarioRepository.java         → interfaz — implementado
+│   │   ├── TareaRepository.java           → interfaz — implementado
+│   │   ├── UsuarioRepositoryMemoria.java  → implementación en memoria con HashMap — implementado
+│   │   └── TareaRepositoryMemoria.java    → implementación en memoria con HashMap — implementado
 │   ├── service/
-│   │   ├── UsuarioService.java    → (stub) reglas de negocio de usuarios
-│   │   └── TareaService.java      → (stub) reglas de negocio de tareas y PriorityQueue
+│   │   ├── package-info.java      → qué va y qué no va en este paquete
+│   │   ├── UsuarioService.java    → reglas de negocio de usuarios — implementado
+│   │   └── TareaService.java      → reglas de negocio de tareas y PriorityQueue — implementado
 │   └── ui/
+│       ├── package-info.java      → qué va y qué no va en este paquete
 │       ├── MenuPrincipal.java     → (stub) menú principal (Swing / JOptionPane)
 │       ├── VistaUsuarios.java     → (stub) pantallas de usuarios
 │       └── VistaTareas.java       → (stub) pantallas de tareas
+├── src/test/java/com/atommanager/service/
+│   ├── UsuarioServiceTest.java    → pruebas de Épica 1 (HU-01, HU-02)
+│   └── TareaServiceTest.java      → pruebas de Épica 2 y HU-03 (HU-03 a HU-07)
 ├── pom.xml
 └── README.md
 ```
@@ -253,6 +262,8 @@ atom_manager/
 
 - [`docs/AtomManager2.1.md`](docs/AtomManager2.1.md): documento de diseño completo (épicas, historias de usuario, requisitos funcionales y no funcionales).
 - [`docs/cambios.md`](docs/cambios.md): registro cronológico de los cambios realizados en el proyecto.
+- [`docs/GUIA-PROXIMO-DESARROLLADOR.md`](docs/GUIA-PROXIMO-DESARROLLADOR.md): en lenguaje simple, qué está hecho, qué falta y dónde agregar cada parte.
+- [`docs/GUIA-PROXIMO-DESARROLLADOR.md`](docs/GUIA-PROXIMO-DESARROLLADOR.md): en lenguaje simple, qué está hecho, qué falta y dónde agregar cada parte.
 
 ## Flujo de trabajo colaborativo
 
