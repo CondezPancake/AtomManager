@@ -6,6 +6,29 @@
 
 ## Historial de cambios
 
+### 2026-08-09 — Implementación de HU-09 (consulta de tareas por estado)
+
+**Descripción:** Se implementó la historia de usuario HU-09 de la Épica 3: consultar las tareas agrupadas por estado en una vista tipo tablero.
+
+**Cambios realizados:**
+
+1. `repository/TareaRepository.java`: se agregó `buscarPorEstado(Estado)` al contrato de acceso a datos.
+2. `repository/TareaRepositoryMemoria.java`: se implementó la consulta sobre el `HashMap` principal, filtrando por el enum `Estado` sin duplicar ni desincronizar datos.
+3. `service/TareaService.java`: se agregó `tareasPorEstado()`, que devuelve un `Map<Estado, List<Tarea>>` con las tres columnas: `POR_REALIZAR`, `EN_PROCESO` y `FINALIZADA`.
+4. `src/test/.../TareaServiceTest.java`: se agregaron pruebas del agrupamiento y del tablero vacío, verificando que las tres columnas siempre estén presentes.
+5. `README.md` y `docs/GUIA-PROXIMO-DESARROLLADOR.md`: se actualizó el estado de avance.
+
+**Decisiones de diseño:**
+- El servicio usa `EnumMap` porque las claves son valores del enum `Estado`; expone la interfaz `Map` para no acoplar a quien consume el resultado.
+- La vista incluye una lista vacía para cada estado aunque no haya tareas, lo que permite a la interfaz gráfica mostrar siempre las tres columnas requeridas.
+- HU-10 no se implementó: es una historia independiente para ordenar todas las tareas por prioridad.
+
+**Próximos pasos (pendientes):**
+- HU-10: consultar todas las tareas ordenadas por prioridad.
+- Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).
+
+---
+
 ### 2026-08-09 — Implementación de HU-08 (cambio de estado de tareas)
 
 **Descripción:** Se implementó la historia de usuario HU-08 de la Épica 3: cambiar el estado de una tarea existente.

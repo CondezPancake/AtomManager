@@ -1,5 +1,6 @@
 package com.atommanager.repository;
 
+import com.atommanager.model.Estado;
 import com.atommanager.model.Tarea;
 
 import java.util.ArrayList;
@@ -36,6 +37,13 @@ public class TareaRepositoryMemoria implements TareaRepository {
         return tareas.values().stream()
                 .filter(tarea -> tarea.getResponsable() != null
                         && tarea.getResponsable().getId().equals(usuarioId))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Tarea> buscarPorEstado(Estado estado) {
+        return tareas.values().stream()
+                .filter(tarea -> tarea.getEstado() == estado)
                 .collect(Collectors.toList());
     }
 

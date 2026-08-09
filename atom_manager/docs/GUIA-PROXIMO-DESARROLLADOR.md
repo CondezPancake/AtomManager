@@ -32,19 +32,7 @@ Todo esto tiene pruebas automáticas, y el proyecto compila sin errores.
 
 ## 3. Qué falta por hacer
 
-### 3.1. Ver las tareas agrupadas por estado
-
-Una tarea ya puede pasar de "Por realizar" a "En proceso" o "Finalizada". Falta mostrar las tareas agrupadas por estado, como un tablero de tres columnas.
-
-- Poder ver las tareas agrupadas por estado, como un tablero de tres columnas.
-
-**Dónde tocar:**
-
-1. Carpeta `repository`, archivos `TareaRepository.java` y `TareaRepositoryMemoria.java`: agregar una forma de buscar las tareas que están en un estado determinado.
-2. Carpeta `service`, archivo `TareaService.java`: agregar la función que devuelve las tareas agrupadas por estado.
-3. Carpeta `src/test/.../service`: agregar pruebas para lo nuevo, copiando el estilo de los métodos que ya están en `TareaServiceTest.java`.
-
-### 3.2. Las pantallas del programa (para que se use sin programar)
+### 3.1. Las pantallas del programa (para que se use sin programar)
 
 Todo lo que funciona hoy, funciona "por dentro". Falta la parte visual:
 
@@ -59,7 +47,7 @@ Todo lo que funciona hoy, funciona "por dentro". Falta la parte visual:
 - Archivo `Main.java` (en la carpeta `com.atommanager`, la de más arriba): hay que completar el método `main`. También tiene un comentario explicando, paso a paso, qué arma y en qué orden.
 - **Regla importante:** las pantallas no tienen que decidir nada por su cuenta (por ejemplo, no tienen que fijarse si un ID ya existe). Solo piden datos, se los pasan a las clases de la carpeta `service`, y muestran lo que esas clases devuelven o el error que devuelven. Toda la parte "inteligente" ya está resuelta en `service`.
 
-### 3.3. Guardar los datos (opcional, solo si sobra tiempo)
+### 3.2. Guardar los datos (opcional, solo si sobra tiempo)
 
 Ahora mismo, si cerrás el programa, se pierde todo lo que cargaste — se guarda solo en la memoria de la computadora mientras el programa está abierto. Guardar esa información en un archivo para que no se pierda es una mejora que **no es obligatoria**: se hace solo si el resto ya está terminado y probado.
 
@@ -116,6 +104,6 @@ Y afuera de esas cuatro carpetas está `Main.java`, que es el botón de arranque
 - ✅ Personas: registrar y consultar — **hecho y probado**.
 - ✅ Tareas: crear, asignar, poner prioridad, consultar — **hecho y probado**.
 - ✅ Tareas: cambiar de estado — **hecho y probado**.
-- ⬜ Tareas: verlas agrupadas por estado — **falta**.
+- ✅ Tareas: verlas agrupadas por estado — **hecho y probado**.
 - ⬜ Pantallas del programa y arranque (`ui` + `Main.java`) — **falta**.
 - ⬜ Guardar los datos en un archivo — **falta, no es obligatorio**.

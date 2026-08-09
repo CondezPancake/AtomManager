@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Épica 2 — Gestión de tareas (HU-04 a HU-07), HU-03 (Épica 1) y
- * HU-08 (Épica 3).
+ * HU-08 y HU-09 (Épica 3).
  */
 class TareaServiceTest {
 
@@ -119,6 +120,32 @@ class TareaServiceTest {
         tareaService.crearTarea("Tarea 2", "desc", Prioridad.BAJA);
 
         assertEquals(2, tareaService.listarTareas().size());
+    }
+
+    @Test
+    void tareasPorEstado_lasAgrupaEnLasTresColumnas() {
+        Tarea porRealizar = tareaService.crearTarea("Por realizar", "desc", Prioridad.BAJA);
+        Tarea enProceso = tareaService.crearTarea("En proceso", "desc", Prioridad.MODERADA);
+        Tarea finalizada = tareaService.crearTarea("Finalizada", "desc", Prioridad.ALTA);
+        tareaService.cambiarEstado(enProceso.getId(), Estado.EN_PROCESO);
+        tareaService.cambiarEstado(finalizada.getId(), Estado.FINALIZADA);
+
+        Map<Estado, List<Tarea>> agrupadas = tareaService.tareasPorEstado();
+
+        assertEquals(List.of(porRealizar), agrupadas.get(Estado.POR_REALIZAR));
+        assertEquals(List.of(enProceso), agrupadas.get(Estado.EN_PROCESO));
+        assertEquals(List.of(finalizada), agrupadas.get(Estado.FINALIZADA));
+    }
+
+    @Test
+    void tareasPorEstado_sinTareas_devuelveLasTresColumnasVacias() {
+        Map<Estado, List<Tarea>> agrupadas = tareaService.tareasPorEstado();
+
+        assertEquals(3, agrupadas.size());
+        assertTrue(agrupadas.containsKey(Estado.POR_REALIZAR));
+        assertTrue(agrupadas.containsKey(Estado.EN_PROCESO));
+        assertTrue(agrupadas.containsKey(Estado.FINALIZADA));
+        assertTrue(agrupadas.values().stream().allMatch(List::isEmpty));
     }
 
     @Test

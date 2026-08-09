@@ -2,7 +2,7 @@
 
 Gestor de tareas de escritorio inspirado en herramientas como Jira y Trello, desarrollado en **Java 17** aplicando Programación Orientada a Objetos y los principios **SOLID**.
 
-> ⚠️ **Estado actual: en desarrollo.** La lógica de usuarios, tareas y cambio de estado está implementada; faltan las consultas de HU-09/HU-10 y la interfaz gráfica. Consultá [`docs/cambios.md`](docs/cambios.md) para ver el registro de avances.
+> ⚠️ **Estado actual: en desarrollo.** La lógica de usuarios, tareas y consultas por estado está implementada; faltan la consulta general por prioridad (HU-10) y la interfaz gráfica. Consultá [`docs/cambios.md`](docs/cambios.md) para ver el registro de avances.
 
 ---
 
@@ -117,7 +117,7 @@ Encapsula el acceso a los datos en memoria. Cada entidad tiene una interfaz pequ
 | `UsuarioRepository` | Interfaz | Contrato de acceso a datos de `Usuario` (guardar, buscar por ID, listar, verificar existencia). |
 | `TareaRepository` | Interfaz | Contrato de acceso a datos de `Tarea` (guardar, buscar por ID, listar, filtrar por usuario/estado). |
 | `UsuarioRepositoryMemoria` | Clase | Implementa `UsuarioRepository` con `Map<String, Usuario>`. |
-| `TareaRepositoryMemoria` | Clase | Implementa `TareaRepository` con `Map<String, Tarea>` y los índices auxiliares por usuario y por estado. |
+| `TareaRepositoryMemoria` | Clase | Implementa `TareaRepository` con `Map<String, Tarea>` y consultas por usuario y por estado. |
 
 #### `com.atommanager.service`
 
