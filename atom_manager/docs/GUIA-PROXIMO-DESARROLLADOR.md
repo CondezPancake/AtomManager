@@ -24,33 +24,23 @@ Ya está hecho y probado lo siguiente:
 - **Ver todas las tareas** que existen.
 - **Ver las tareas de una persona ordenadas de la más urgente a la menos urgente**.
 - **Ver todas las tareas ordenadas de la más urgente a la menos urgente**.
+- **Usar el programa con una ventana de verdad** (JavaFX): una pestaña "Usuarios" y una pestaña "Tareas", con formularios, tablas y botones — no hace falta escribir código ni tocar los tests para usarlo.
 
-Todo esto tiene pruebas automáticas, y el proyecto compila sin errores.
+Todo esto tiene pruebas automáticas (para la lógica de negocio; la parte visual se prueba a mano, abriendo el programa), y el proyecto compila sin errores.
 
-**Importante:** todo lo anterior hoy solo se puede usar escribiendo código Java (por ejemplo, desde las pruebas). Todavía **no hay ninguna pantalla** para que una persona común use el programa haciendo clicks. Eso es lo primero que falta.
+Para probarla vos mismo: `mvn exec:java -Dexec.mainClass="com.atommanager.Main"` (parado en la carpeta `atom_manager`, donde está `pom.xml`).
 
 ---
 
 ## 3. Qué falta por hacer
 
-### 3.1. Las pantallas del programa (para que se use sin programar)
+### 3.1. Guardar los datos (opcional, solo si sobra tiempo)
 
-Todo lo que funciona hoy, funciona "por dentro". Falta la parte visual:
+Ahora mismo, si cerrás el programa, se pierde todo lo que cargaste — se guarda solo en la memoria de la computadora mientras el programa está abierto. Guardar esa información en un archivo para que no se pierda es una mejora que **no es obligatoria**: se hace solo si el resto ya está terminado y probado (que es el caso).
 
-- La ventana principal con el menú de opciones.
-- La ventana para registrar y ver personas.
-- La ventana para crear, asignar y consultar tareas.
-- Conectar todo esto en el archivo `Main.java` para que, al ejecutar el programa, se abra el menú.
+### 3.2. Pulir la interfaz (opcional)
 
-**Dónde tocar:**
-
-- Carpeta `ui`: los archivos `MenuPrincipal.java`, `VistaUsuarios.java` y `VistaTareas.java` ya existen, pero están vacíos — solo tienen un comentario arriba explicando qué deberían hacer. Ahí es donde va el código real de las pantallas (con `JOptionPane`, que son esos cuadros de diálogo simples de Java).
-- Archivo `Main.java` (en la carpeta `com.atommanager`, la de más arriba): hay que completar el método `main`. También tiene un comentario explicando, paso a paso, qué arma y en qué orden.
-- **Regla importante:** las pantallas no tienen que decidir nada por su cuenta (por ejemplo, no tienen que fijarse si un ID ya existe). Solo piden datos, se los pasan a las clases de la carpeta `service`, y muestran lo que esas clases devuelven o el error que devuelven. Toda la parte "inteligente" ya está resuelta en `service`.
-
-### 3.2. Guardar los datos (opcional, solo si sobra tiempo)
-
-Ahora mismo, si cerrás el programa, se pierde todo lo que cargaste — se guarda solo en la memoria de la computadora mientras el programa está abierto. Guardar esa información en un archivo para que no se pierda es una mejora que **no es obligatoria**: se hace solo si el resto ya está terminado y probado.
+La ventana de JavaFX ya funciona completa, pero es simple (formularios en fila, tablas básicas). Si querés mejorarla más, la carpeta `ui` es el lugar — mirá `MenuPrincipal.java`, `VistaUsuarios.java` y `VistaTareas.java`, y el archivo de estilos en `src/main/resources/atommanager.css`.
 
 ---
 
@@ -63,7 +53,7 @@ Dentro de `src/main/java/com/atommanager` hay cuatro carpetas, cada una con un p
 | `model` | Las "cosas" del sistema. Son como fichas de datos, sin reglas de negocio. | Una persona, una tarea, una prioridad. |
 | `repository` | Dónde se guardan y se buscan esas fichas (hoy, solo en la memoria de la compu). | "Guardame esta tarea", "buscame la persona con tal ID". |
 | `service` | Las reglas del negocio: qué se puede hacer y qué no. | "No dejes crear una tarea sin título", "no asignes una tarea a alguien que no existe". |
-| `ui` | Las pantallas, lo que ve la persona que usa el programa. | El menú, el formulario para crear una tarea. |
+| `ui` | Las pantallas, lo que ve la persona que usa el programa (JavaFX). | La ventana con pestañas, el formulario para crear una tarea. |
 
 Y afuera de esas cuatro carpetas está `Main.java`, que es el botón de arranque: junta todas las piezas y prende el programa.
 
@@ -107,5 +97,5 @@ Y afuera de esas cuatro carpetas está `Main.java`, que es el botón de arranque
 - ✅ Tareas: cambiar de estado — **hecho y probado**.
 - ✅ Tareas: verlas agrupadas por estado — **hecho y probado**.
 - ✅ Tareas: ver todas ordenadas por prioridad — **hecho y probado**.
-- ⬜ Pantallas del programa y arranque (`ui` + `Main.java`) — **falta**.
+- ✅ Interfaz gráfica en JavaFX (pestañas, formularios, tablas) — **hecho**.
 - ⬜ Guardar los datos en un archivo — **falta, no es obligatorio**.

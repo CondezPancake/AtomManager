@@ -1,17 +1,57 @@
 package com.atommanager.ui;
 
+import com.atommanager.service.TareaService;
+import com.atommanager.service.UsuarioService;
+
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.control.TabPane;
+import javafx.stage.Stage;
+
 /**
- * Menú principal de la aplicación (Swing / JOptionPane, RF-17).
+ * Ventana principal, con JavaFX: dos apartados bien separados (pestañas),
+ * uno para usuarios y otro para tareas, en vez de un menú con una lista de
+ * opciones en texto plano.
  *
- * <p>SOLID-S (responsabilidad única): esta clase solo presenta y navega;
- * no contiene reglas de negocio, delega en {@code UsuarioService} y
- * {@code TareaService}.</p>
- *
- * <p>Miembros a implementar:</p>
- * <ul>
- *   <li>Referencias a {@code UsuarioService} y {@code TareaService} (inyectadas desde {@code Main}).</li>
- *   <li>Menú de opciones y navegación hacia {@code VistaUsuarios} / {@code VistaTareas}.</li>
- * </ul>
+ * <p>No contiene reglas de negocio: cada pestaña la arma
+ * {@link VistaUsuarios} o {@link VistaTareas}, que a su vez delegan en los
+ * {@code service} correspondientes.</p>
  */
 public class MenuPrincipal {
+
+    private final UsuarioService usuarioService;
+    private final TareaService tareaService;
+
+    public MenuPrincipal(UsuarioService usuarioService, TareaService tareaService) {
+        this.usuarioService = usuarioService;
+        this.tareaService = tareaService;
+    }
+
+    /**
+     * Arranca el motor gráfico de JavaFX y muestra la ventana principal.
+     *
+     * <p>Se usa {@code Platform.startup(...)} en vez de extender
+     * {@code Application}: así {@code MenuPrincipal} sigue recibiendo los
+     * {@code service} por constructor, igual que en las versiones
+     * anteriores (terminal, JOptionPane, Swing).</p>
+     */
+    public void mostrar() {
+        Platform.startup(this::construirVentana);
+    }
+
+    private void construirVentana() {
+        VistaUsuarios vistaUsuarios = new VistaUsuarios(usuarioService);
+        VistaTareas vistaTareas = new VistaTareas(tareaService);
+
+        TabPane pestanas = new TabPane(vistaUsuarios.crearPestana(), vistaTareas.crearPestana());
+        pestanas.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+        Scene escena = new Scene(pestanas, 960, 620);
+        escena.getStylesheets().add(getClass().getResource("/atommanager.css").toExternalForm());
+
+        Stage ventana = new Stage();
+        ventana.setTitle("AtomManager");
+        ventana.setScene(escena);
+        ventana.show();
+    }
 }

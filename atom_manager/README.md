@@ -2,7 +2,7 @@
 
 Gestor de tareas de escritorio inspirado en herramientas como Jira y Trello, desarrollado en **Java 17** aplicando Programación Orientada a Objetos y los principios **SOLID**.
 
-> ⚠️ **Estado actual: en desarrollo.** La lógica de usuarios y tareas está implementada; falta la interfaz gráfica para usarla como aplicación de escritorio. Consultá [`docs/cambios.md`](docs/cambios.md) para ver el registro de avances.
+> ✅ **Estado actual: Épicas 1, 2 y 3 implementadas y probadas (20/20 tests), con interfaz gráfica en JavaFX.** Queda pendiente la persistencia en archivo (opcional). Consultá [`docs/cambios.md`](docs/cambios.md) para ver el registro de avances.
 
 ---
 
@@ -27,7 +27,7 @@ Gestor de tareas de escritorio inspirado en herramientas como Jira y Trello, des
 
 AtomManager permite crear usuarios, crear tareas, asignarlas a un responsable, establecer su prioridad y controlar su estado a lo largo del desarrollo de un proyecto.
 
-La interfaz gráfica se implementa con **Swing / JOptionPane**, opcionalmente apoyada en **FlatLaf** para mejorar la apariencia. Los datos se manejan en memoria mediante `Map` / `HashMap`, y el ordenamiento por prioridad se resuelve con la interfaz `Queue` (`PriorityQueue`).
+La interfaz gráfica está hecha en **JavaFX** (ventana con pestañas: "Usuarios" y "Tareas"). Se llegó ahí pasando por tres etapas previas — terminal, `JOptionPane` y Swing con FlatLaf — reemplazando cada una a la anterior. Los datos se manejan en memoria mediante `Map` / `HashMap`, y el ordenamiento por prioridad se resuelve con la interfaz `Queue` (`PriorityQueue`).
 
 ## Objetivo
 
@@ -46,7 +46,7 @@ Desarrollar un gestor de tareas que permita a un equipo de trabajo organizar, as
 - Utilizar la interfaz `Queue` (`PriorityQueue`) para el ordenamiento por prioridad.
 - Modelar el sistema aplicando POO (encapsulamiento, abstracción, enums, interfaces).
 - Aplicar los principios SOLID en la separación de responsabilidades.
-- Desarrollar la interfaz gráfica con Swing / JOptionPane.
+- Desarrollar la interfaz gráfica (terminal → JOptionPane → Swing/FlatLaf → JavaFX).
 - Utilizar GitHub para el trabajo colaborativo con Conventional Commits.
 
 ## Tecnologías
@@ -55,7 +55,7 @@ Desarrollar un gestor de tareas que permita a un equipo de trabajo organizar, as
 | --- | --- |
 | Lenguaje | Java 17 |
 | Build tool | Maven |
-| Interfaz gráfica | Swing / JOptionPane (opcionalmente [FlatLaf](https://www.formdev.com/flatlaf/)) |
+| Interfaz gráfica | [JavaFX](https://openjfx.io/) 17 (antes: terminal → JOptionPane → Swing/FlatLaf) |
 | Estructuras de datos | `HashMap`, `Queue` (`PriorityQueue`) |
 | Control de versiones | Git + GitHub, [Conventional Commits](https://www.conventionalcommits.org/) |
 
@@ -82,10 +82,11 @@ com.atommanager
 │   ├── UsuarioService  → registrar/listar usuarios (depende de UsuarioRepository).
 │   └── TareaService    → crear/asignar/cambiar prioridad-estado, cola de prioridad (depende de TareaRepository).
 │
-├── ui/                → Presentación (Swing / JOptionPane), sin lógica de negocio.
-│   ├── MenuPrincipal   → menú de arranque, navega a las demás vistas.
-│   ├── VistaUsuarios   → alta y listado de usuarios.
-│   └── VistaTareas     → alta, asignación y consultas de tareas.
+├── ui/                → Presentación (JavaFX), sin lógica de negocio.
+│   ├── MenuPrincipal   → arranca JavaFX y arma la ventana con las pestañas.
+│   ├── VistaUsuarios   → pestaña de usuarios: alta y tabla de registrados.
+│   ├── VistaTareas     → pestaña de tareas: alta, tabla, acciones y consultas.
+│   └── Dialogos        → ayudas compartidas para errores y listados.
 │
 └── Main.java          → único punto de entrada (método main). Es la única clase que conoce las
                           implementaciones concretas: instancia los *Repository*Memoria, los inyecta
@@ -130,13 +131,14 @@ Contiene las reglas de negocio: validaciones, asignación de tareas, cambios de 
 
 #### `com.atommanager.ui`
 
-Capa de presentación con Swing / JOptionPane. No contiene reglas de negocio: solo pide datos al usuario, invoca al `service` correspondiente y muestra el resultado (SOLID-S).
+Capa de presentación con JavaFX. No contiene reglas de negocio: solo pide datos al usuario, invoca al `service` correspondiente y muestra el resultado (SOLID-S).
 
 | Tipo | Kind | Responsabilidad |
 | --- | --- | --- |
-| `MenuPrincipal` | Clase | Menú de arranque de la aplicación; navega hacia las vistas de usuarios y tareas. |
-| `VistaUsuarios` | Clase | Pantallas para registrar y consultar usuarios. |
-| `VistaTareas` | Clase | Pantallas para crear, asignar tareas y consultarlas por usuario, estado o prioridad. |
+| `MenuPrincipal` | Clase | Arranca JavaFX (`Platform.startup`) y arma la ventana principal, con una pestaña por apartado. |
+| `VistaUsuarios` | Clase | Pestaña de usuarios: formulario de alta + tabla con los registrados. |
+| `VistaTareas` | Clase | Pestaña de tareas: formulario de alta, tabla, acciones sobre la fila seleccionada (asignar, cambiar prioridad/estado) y consultas (por usuario, por estado, por prioridad general). |
+| `Dialogos` | Clase | Ayudas compartidas para mostrar errores de negocio y listados largos, sin repetir ese código en las dos vistas. |
 
 #### `com.atommanager.Main`
 
@@ -196,9 +198,11 @@ colaAtencion.addAll(tareasDelUsuario);
 
 ## Alcance del proyecto
 
-**Dentro del alcance:** usuarios (registrar y consultar); tareas (crear, editar, asignar responsable, prioridad y estado); consultas por usuario ordenadas por prioridad, por estado (tipo tablero) y por prioridad; e interfaz Swing / JOptionPane.
+**Dentro del alcance:** usuarios (registrar y consultar); tareas (crear, editar, asignar responsable, prioridad y estado); consultas por usuario ordenadas por prioridad, por estado (tipo tablero) y por prioridad; e interfaz gráfica en JavaFX.
 
-**Fuera del alcance (por ahora):** JavaFX, persistencia obligatoria en JSON, integración con Jira/Trello, app móvil, chat interno, notificaciones, calendario avanzado, autenticación externa, roles avanzados, API REST, bases de datos SQL y despliegue en la nube.
+**Fuera del alcance (por ahora):** persistencia obligatoria en JSON, integración con Jira/Trello, app móvil, chat interno, notificaciones, calendario avanzado, autenticación externa, roles avanzados, API REST, bases de datos SQL y despliegue en la nube.
+
+> JavaFX estaba originalmente fuera de alcance en `AtomManager2.1.md` (requería módulos y configuración adicional). Se agregó igual, después de tener la lógica de negocio (Épicas 1 a 3) terminada y probada, para mejorar la experiencia de usuario — ver la nota en la sección 1 de `AtomManager2.1.md` para el detalle de esa decisión.
 
 La persistencia de datos (guardar/cargar al cerrar la app) queda como funcionalidad **opcional**, a abordar solo si el resto del sistema está terminado y probado.
 
@@ -228,8 +232,10 @@ atom_manager/
 │   ├── AtomManager2.1.md                  → documento de diseño: épicas, historias de usuario, requisitos
 │   ├── cambios.md                         → registro histórico de cambios del proyecto
 │   └── GUIA-PROXIMO-DESARROLLADOR.md      → qué está hecho, qué falta y dónde tocar, en lenguaje simple
+├── src/main/resources/
+│   └── atommanager.css            → estilos de la ventana de JavaFX (colores, botones, tabla)
 ├── src/main/java/com/atommanager/
-│   ├── Main.java                  → punto de entrada (todavía sin la inyección de dependencias)
+│   ├── Main.java                  → punto de entrada, arma las dependencias e inicia MenuPrincipal
 │   ├── model/
 │   │   ├── package-info.java      → qué va y qué no va en este paquete
 │   │   ├── Usuario.java           → integrante del proyecto — implementado
@@ -248,12 +254,13 @@ atom_manager/
 │   │   └── TareaService.java      → reglas de negocio de tareas y PriorityQueue — implementado
 │   └── ui/
 │       ├── package-info.java      → qué va y qué no va en este paquete
-│       ├── MenuPrincipal.java     → (stub) menú principal (Swing / JOptionPane)
-│       ├── VistaUsuarios.java     → (stub) pantallas de usuarios
-│       └── VistaTareas.java       → (stub) pantallas de tareas
+│       ├── MenuPrincipal.java     → ventana principal de JavaFX (pestañas) — implementado
+│       ├── VistaUsuarios.java     → pestaña de usuarios — implementado
+│       ├── VistaTareas.java       → pestaña de tareas — implementado
+│       └── Dialogos.java          → ayudas compartidas de error/listado — implementado
 ├── src/test/java/com/atommanager/service/
 │   ├── UsuarioServiceTest.java    → pruebas de Épica 1 (HU-01, HU-02)
-│   └── TareaServiceTest.java      → pruebas de Épica 2 y HU-03 (HU-03 a HU-07)
+│   └── TareaServiceTest.java      → pruebas de Épica 2 y 3 (HU-03 a HU-10)
 ├── pom.xml
 └── README.md
 ```
@@ -262,7 +269,6 @@ atom_manager/
 
 - [`docs/AtomManager2.1.md`](docs/AtomManager2.1.md): documento de diseño completo (épicas, historias de usuario, requisitos funcionales y no funcionales).
 - [`docs/cambios.md`](docs/cambios.md): registro cronológico de los cambios realizados en el proyecto.
-- [`docs/GUIA-PROXIMO-DESARROLLADOR.md`](docs/GUIA-PROXIMO-DESARROLLADOR.md): en lenguaje simple, qué está hecho, qué falta y dónde agregar cada parte.
 - [`docs/GUIA-PROXIMO-DESARROLLADOR.md`](docs/GUIA-PROXIMO-DESARROLLADOR.md): en lenguaje simple, qué está hecho, qué falta y dónde agregar cada parte.
 
 ## Flujo de trabajo colaborativo

@@ -6,6 +6,116 @@
 
 ## Historial de cambios
 
+### 2026-08-09 — Reescritura de la interfaz en JavaFX
+
+**Descripción:** Después de ver la ventana de Swing+FlatLaf, el usuario la siguió encontrando anticuada y pidió priorizar la experiencia de usuario, con JavaFX si hacía falta. Se le preguntó explícitamente si prefería quedarse en Swing (con retoques) o pasar a JavaFX (reescritura completa, fuera del alcance original de `AtomManager2.1.md`); eligió JavaFX. Esto reemplaza — no convive con — la versión de Swing/FlatLaf, siguiendo la misma regla de siempre ("un solo punto de entrada, sin versiones viejas dando vueltas").
+
+**Cambios realizados:**
+1. `pom.xml`: se sacó la dependencia de FlatLaf. Se agregó `javafx-controls:17.0.20` (misma versión mayor que el Java del proyecto) y 3 perfiles de Maven (`javafx-linux`, `javafx-mac`, `javafx-windows`) que detectan el sistema operativo de quien compila y arman la variante del `.jar` que corresponde — así el proyecto sigue funcionando clonado en cualquier sistema, sin tocar el `pom.xml` a mano.
+2. `src/main/resources/atommanager.css`: hoja de estilos con colores, tipografía y botones; carpeta `resources` nueva en el proyecto (convención estándar de Maven para este tipo de archivos).
+3. `ui/MenuPrincipal.java` reescrito: ya no extiende `JFrame`. Arranca JavaFX con `Platform.startup(...)` (en vez de extender `Application`, que exige un constructor vacío) y arma una ventana con `TabPane`: una pestaña "Usuarios" y una pestaña "Tareas". Sigue recibiendo `UsuarioService`/`TareaService` por constructor, igual que en todas las versiones anteriores.
+4. `ui/VistaUsuarios.java` reescrito: la pestaña de usuarios pasó de una cadena de cuadros de diálogo a un formulario fijo (ID, Nombre, botón) + una `TableView` con todos los usuarios, que se refresca sola después de cada alta.
+5. `ui/VistaTareas.java` reescrito: la pestaña de tareas tiene un formulario de alta, una `TableView` con todas las tareas (columnas ID, Título, Prioridad, Estado, Responsable), un panel de acciones que opera sobre la fila seleccionada (asignar, cambiar prioridad, cambiar estado) y un panel de consultas (por usuario, tablero por estado, todas por prioridad) que abre un cuadro con el resultado.
+6. `ui/Dialogos.java` (nuevo, package-private): agrupa el manejo de errores (`IllegalArgumentException` → alerta) y el cuadro de listados largos, para no repetir ese código en las dos vistas.
+7. `Main.java`: se sacó `FlatLightLaf.setup()`; el resto no cambió — sigue armando los repositorios/services e invocando `new MenuPrincipal(...).mostrar()`.
+8. `docs/AtomManager2.1.md`: se actualizó la sección 1 (con una nota explicando la decisión) y la sección 9 (JavaFX ya no figura en "fuera de alcance"; la tecnología de interfaz en 9.1 pasa a ser JavaFX). El resto del documento (épicas, requisitos, estructuras de datos) no se tocó.
+9. `README.md`: actualizado el estado del proyecto, la descripción, la tabla de tecnologías, el árbol de arquitectura, la tabla del paquete `ui`, el alcance y el árbol de "Estructura del repositorio" (agrega `resources/`, `Dialogos.java`, saca las etiquetas viejas de Swing/JOptionPane). De paso se corrigió una línea duplicada que había quedado en la sección de Documentación.
+10. `docs/GUIA-PROXIMO-DESARROLLADOR.md`: actualizada — la sección "qué falta" ya no incluye las pantallas (están hechas), solo queda la persistencia opcional y, como ítem opcional nuevo, pulir más la interfaz si se quiere.
+
+**Verificación:** `mvn clean compile` y `mvn test` — compila sin errores y las 20 pruebas de `service` siguen pasando (no dependen de la interfaz). La interfaz gráfica en sí no se puede probar de forma automática desde este entorno; queda a cargo del usuario correrla y probarla a mano, como en las etapas anteriores.
+
+**Decisiones de diseño:**
+- Se usó `Platform.startup(Runnable)` en vez de extender `javafx.application.Application`, específicamente para poder seguir inyectando `UsuarioService`/`TareaService` por constructor en `MenuPrincipal` — `Application` exige que el framework cree la instancia por reflexión con un constructor vacío, lo que hubiera roto el patrón de inyección de dependencias usado en todo el proyecto.
+- Las consultas especiales (por usuario, por estado, por prioridad general) siguen llamando explícitamente a los métodos de `TareaService` que usan `PriorityQueue`/`Map<Estado, List<Tarea>>`, en vez de ordenar la tabla del lado de la ventana — así la interfaz sigue demostrando el uso real de esas estructuras de datos (requisito del enunciado), no solo un efecto visual parecido.
+
+**Próximos pasos (pendientes):**
+- Persistencia opcional (Épica 5), solo si se quiere ir más allá del alcance actual.
+- (Opcional) seguir puliendo la interfaz de JavaFX si se desea.
+
+---
+
+### 2026-08-09 — FlatLaf para mejorar la apariencia de la ventana
+
+**Descripción:** El usuario probó la ventana de Swing (`JFrame`) y la encontró fea — es el look & feel por defecto de Swing, conocido por eso. Se agregó FlatLaf, que es justo la mejora de apariencia "de bajo costo" que ya preveía la sección 1 y la RNF-02 de `AtomManager2.1.md` ("opcionalmente puede usarse FlatLaf"). No hizo falta salir del alcance del documento de diseño para esto.
+
+**Cambios realizados:**
+1. `pom.xml`: agregada la dependencia `com.formdev:flatlaf:3.7.2`.
+2. `Main.java`: se agregó `FlatLightLaf.setup();` como primera línea de `main(...)`, antes de crear cualquier ventana.
+3. No se tocó `ui/MenuPrincipal.java`, `VistaUsuarios.java` ni `VistaTareas.java`: FlatLaf cambia la apariencia de los componentes de Swing existentes (botones, diálogos, fuentes, colores) sin que el código que los crea tenga que saber nada al respecto.
+4. `README.md`: actualizada la descripción y la tabla de tecnologías (FlatLaf pasa de "opcional" a "en uso").
+
+**Verificación:** `mvn clean test` — `BUILD SUCCESS`, 20/20 pruebas (FlatLaf no afecta la lógica de negocio, solo la apariencia).
+
+**Decisión sobre JavaFX:** antes de este cambio se le preguntó al usuario si para mejorar la apariencia prefería FlatLaf (bajo costo, ya previsto en el documento) o reescribir toda la interfaz en JavaFX (fuera de alcance, requiere módulos adicionales). Se optó por FlatLaf. La versión con JavaFX sigue como posible "cuarto paso" opcional a futuro si se necesita, pero no era necesaria para resolver el pedido de "que se vea mejor".
+
+**Próximos pasos (pendientes):**
+- (Opcional, fuera de alcance) Versión con JavaFX, si más adelante se decide explorarla.
+- Persistencia opcional (Épica 5), solo si el resto del proyecto está terminado y probado.
+
+---
+
+### 2026-08-09 — Interfaz con Swing "de verdad" (ventana JFrame)
+
+**Descripción:** Tercera etapa de interfaz, reemplazando el menú de `JOptionPane` (que se reabría en cada vuelta) por una ventana persistente con botones.
+
+**Cambios realizados:**
+1. `ui/MenuPrincipal.java` reescrito: ahora extiende `JFrame`, con un panel de 11 botones (uno por cada una de las 10 acciones + Salir), en vez de mostrar un cuadro de texto con la lista de opciones en cada vuelta.
+2. `VistaUsuarios.java` y `VistaTareas.java`: **sin cambios**. Siguen usando `JOptionPane` para pedir datos puntuales (id, nombre, prioridad, etc.) — eso también es Swing, y reescribir cada formulario como un `JDialog` propio se dejó de lado para no complicar el proyecto sin necesidad real.
+3. `Main.java`: mismo llamado a `new MenuPrincipal(usuarioService, tareaService).mostrar()`, sin cambios de código (solo se actualizó el comentario).
+
+**Verificación:** `mvn clean test` — `BUILD SUCCESS`, 20/20 pruebas (no dependen de la interfaz).
+
+**Próximos pasos (pendientes):**
+- Mejorar la apariencia visual (ver entrada siguiente: FlatLaf).
+- (Opcional, fuera de alcance) Versión con JavaFX.
+- Persistencia opcional (Épica 5).
+
+---
+
+### 2026-08-09 — Interfaz con JOptionPane (segunda etapa)
+
+**Descripción:** Segunda etapa de interfaz (después de la terminal): se implementó `ui/MenuPrincipal.java`, `ui/VistaUsuarios.java` y `ui/VistaTareas.java` con `JOptionPane`, siguiendo la estructura de paquetes ya documentada (en vez de tener todo el código de la interfaz metido en `Main.java`, como en la fase de terminal).
+
+**Cambios realizados:**
+1. `ui/VistaUsuarios.java`: `registrarUsuario()` y `consultarUsuarios()`, con diálogos de `JOptionPane`.
+2. `ui/VistaTareas.java`: las 8 acciones de tareas (crear, asignar, cambiar prioridad, cambiar estado, y las 4 consultas), todas con diálogos de `JOptionPane`.
+3. `ui/MenuPrincipal.java`: arma `VistaUsuarios`/`VistaTareas` y controla el bucle del menú (un `JOptionPane.showInputDialog` con las 10 opciones + Salir, que se repite hasta elegir 0 o cerrar la ventana).
+4. `Main.java`: se simplificó a solo armar las dependencias y llamar a `new MenuPrincipal(...).mostrar()` — la lógica del menú que antes estaba ahí se movió a la carpeta `ui`, donde siempre debió estar según el documento de diseño.
+
+**Decisiones de diseño:** ninguna de las tres clases valida ni decide nada por su cuenta — todas las excepciones de negocio (`IllegalArgumentException`) las sigue tirando `service`, y `MenuPrincipal` las atrapa en un solo lugar para mostrarlas como diálogo de error.
+
+**Verificación:** `mvn clean test` — `BUILD SUCCESS`, 20/20 pruebas (no dependen de la interfaz; la interfaz gráfica no se puede probar de forma automática, se probó a mano).
+
+**Próximos pasos (pendientes):**
+- Reemplazar por una ventana con Swing (`JFrame`).
+- (Opcional, fuera de alcance) Versión con JavaFX.
+- Persistencia opcional (Épica 5).
+
+---
+
+### 2026-08-09 — Main.java al día con Épica 3, se elimina MainPruebas.java, se valida y se restaura el changelog
+
+**Descripción:** El equipo dio por implementadas (casi) todas las historias de usuario y pidió dejar de usar `MainPruebas.java`, probar todo desde `Main.java`, y revisar/validar `docs/cambios.md`.
+
+**Hallazgo al revisar `cambios.md`:** el merge de la rama con HU-08/HU-09/HU-10 (`FeatureAtomStatusTaskEpics4_5`) con la rama que traía el menú de terminal y la decisión de Java 17 tuvo un conflicto en este archivo. Se resolvió quedándose con una sola versión, y 3 entradas completas se perdieron del historial (aunque el código sí se mergeó bien): "Comentarios de paquete en lenguaje simple", "Main.java: primera interfaz de usuario (terminal)" y "Definido: el proyecto usa Java 17". Se restauraron más abajo, en el lugar donde cronológicamente correspondían, con una nota explicando qué pasó.
+
+**Cambios realizados:**
+1. `Main.java`: el menú de terminal (que solo cubría Épica 1 y 2) se completó con las 3 opciones de Épica 3: cambiar el estado de una tarea (HU-08), consultar las tareas agrupadas por estado en formato tablero (HU-09), y consultar todas las tareas ordenadas por prioridad (HU-10). El menú pasó de 7 a 10 opciones.
+2. Se borró `src/main/java/com/atommanager/MainPruebas.java`: ya cumplió su función (probar el menú sin arriesgar `Main.java`) y el equipo confirmó que ya no hace falta.
+3. Se restauraron las 3 entradas de `cambios.md` perdidas en el merge (ver más abajo, en su ubicación cronológica).
+
+**Verificación:**
+- `mvn clean test`: `BUILD SUCCESS`, **20/20 pruebas** (antes eran 13; las 7 nuevas son de HU-08/HU-09/HU-10).
+- `Main.java` corrido de punta a punta simulando las 10 opciones del menú (registrar usuario, crear tarea, asignar, cambiar prioridad, cambiar estado, consultar todas, consultar por usuario, consultar por estado/tablero, consultar todas por prioridad, salir): todas responden correctamente, sin excepciones sin atrapar, y los datos quedan consistentes entre pasos (por ejemplo, la tarea creada en Alta y bajada a Baja se ve como Baja en las consultas posteriores).
+
+**Próximos pasos (pendientes):**
+- Reemplazar el menú de `Main.java` por una versión con `JOptionPane`.
+- Después, reemplazar esa versión por una con Swing (ventanas con `JFrame`).
+- Como ejercicio extra fuera de alcance: una versión con JavaFX, actualizando `AtomManager2.1.md` para reflejar esa decisión cuando se llegue a esa etapa.
+- Persistencia opcional (Épica 5), solo si el resto del proyecto está terminado y probado.
+
+---
+
 ### 2026-08-09 — Implementación de HU-10 (consulta general por prioridad)
 
 **Descripción:** Se implementó la historia de usuario HU-10 de la Épica 3: consultar todas las tareas ordenadas de mayor a menor prioridad.
@@ -69,6 +179,52 @@
 - HU-09: consultar tareas agrupadas por estado.
 - HU-10: consultar todas las tareas ordenadas por prioridad.
 - Implementar la capa `ui` (Swing / JOptionPane) y completar `Main.java` (inyección de dependencias).
+
+---
+
+> **Nota de recuperación:** las 3 entradas siguientes (package-info en lenguaje simple, Main.java por terminal, decisión de Java 17) se hicieron en paralelo a HU-08/HU-09/HU-10, en otra rama. Al mergear ambas ramas, el conflicto en este archivo se resolvió quedándose con una sola versión y estas 3 entradas se perdieron del changelog — aunque el código correspondiente sí siguió en el proyecto (se verificó que existe). Se restauran acá para que el registro quede completo.
+
+### 2026-08-09 — Comentarios de paquete en lenguaje simple
+
+**Descripción:** Se reescribieron los 4 `package-info.java` (`model`, `repository`, `service`, `ui`) porque el equipo los encontró poco claros: usaban códigos como "SOLID-S"/"SOLID-D"/"SOLID-L" y referencias a secciones del documento de diseño (RF-17, sección 4.1/4.2) sin explicar qué significaban en la práctica.
+
+**Cambios realizados:** mismo contenido y ubicación de cada uno, pero explicado en español simple: qué hay en la carpeta, qué NO va ahí, y por qué está organizado así, sin siglas ni referencias a números de requisito. Se mantiene el mismo tono que `docs/GUIA-PROXIMO-DESARROLLADOR.md`.
+
+**Verificación:** `mvn test` — sigue compilando y las pruebas siguen pasando (son comentarios, no cambia ningún comportamiento).
+
+---
+
+### 2026-08-09 — Main.java: primera interfaz de usuario (terminal)
+
+**Descripción:** A pedido del equipo, se va a interactuar con las épicas implementadas en tres etapas progresivas: primero por terminal, después con `JOptionPane`, y por último con Swing (más una cuarta etapa opcional con JavaFX, fuera del alcance oficial del documento de diseño, como ejercicio extra). Se decidió que las etapas van a vivir todas en `Main.java`, reemplazando cada una a la anterior — no van a convivir varias interfaces sueltas en el proyecto.
+
+**Cambios realizados:**
+1. `Main.java` completado: arma las dependencias (`UsuarioRepositoryMemoria`, `TareaRepositoryMemoria`, `UsuarioService`, `TareaService`) y levanta un menú por consola con `Scanner`.
+2. El menú cubre las 7 historias de usuario de Épica 1 y 2: registrar usuario, consultar usuarios, crear tarea, asignar tarea, cambiar prioridad, consultar todas las tareas, y consultar las tareas de un usuario ordenadas por prioridad.
+3. Los errores de negocio (`IllegalArgumentException` que tiran los `service`, por ejemplo id duplicado o usuario inexistente) se atrapan en el menú y se muestran como mensaje, sin cortar el programa.
+4. `MainPruebas.java`: copia temporal de `Main.java` para que el usuario pudiera correr y probar el menú de forma interactiva (tipeando él mismo) sin arriesgar la versión "oficial" mientras se iteraba.
+
+**Verificación:** se corrió el programa de punta a punta simulando una sesión completa (registrar usuario → crear tarea → asignar → cambiar prioridad → consultar) y también los casos de error (id duplicado, tarea inexistente, opción de menú inválida): todo responde como se espera, sin excepciones sin atrapar.
+
+**Próximos pasos (pendientes):**
+- Reemplazar el menú de `Main.java` por una versión con `JOptionPane`.
+- Después, reemplazar esa versión por una con Swing (ventanas con `JFrame`).
+- Como ejercicio extra fuera de alcance: una versión con JavaFX, actualizando `AtomManager2.1.md` para reflejar esa decisión cuando se llegue a esa etapa.
+
+---
+
+### 2026-08-09 — Definido: el proyecto usa Java 17
+
+**Descripción:** Al correr `MainPruebas.java` desde el IDE apareció `UnsupportedClassVersionError`: el IDE ejecuta con `java-17-openjdk` (class file version 61), pero `pom.xml` compilaba para Java 21 (class file version 65). Esto es la misma inconsistencia Java 17/README vs Java 21/`pom.xml` que quedaba pendiente desde varias entradas atrás — recién ahí se manifestó como error real, no solo como discrepancia en la documentación.
+
+**Decisión:** el proyecto queda en **Java 17**. Motivos: (1) es lo que el IDE del usuario ejecuta por defecto — hay JDK 17, 21 y 26 instalados en la máquina, y el `java` con el que corre el botón "Run" del IDE es el 17; (2) el código no usa ninguna característica exclusiva de Java 21 o superior (se revisó: sin `record`, `sealed`, pattern matching en `switch`, etc.) — todo compila y corre igual en 17; (3) es lo que ya decía `README.md` desde que el usuario lo dejó así explícitamente en una sesión anterior.
+
+**Cambios realizados:**
+1. `pom.xml`: `maven.compiler.source`/`target` de `21` a `17`.
+2. `mvn clean test`: recompilado desde cero, `.class` ahora en major version 61 (Java 17).
+3. Verificado corriendo `MainPruebas` directamente con `/usr/lib/jvm/java-17-openjdk/bin/java` (el mismo binario del error original): ya no tira `UnsupportedClassVersionError`.
+
+**Esto cierra el punto "definir si el proyecto usa Java 17 o Java 21"** que venía repitiéndose como pendiente desde hace varias entradas de este documento.
 
 ---
 

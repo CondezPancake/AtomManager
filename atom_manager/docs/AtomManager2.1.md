@@ -6,7 +6,9 @@ El proyecto consiste en desarrollar una aplicación de escritorio para la **gest
 
 La aplicación permitirá crear usuarios, crear tareas, asignarlas, establecer prioridades y controlar su estado durante el desarrollo de un proyecto.
 
-La interfaz se implementará con **Swing / JOptionPane** (opción permitida explícitamente por el enunciado), apoyada opcionalmente en la librería de diseño **FlatLaf** para mejorar la apariencia sin costo de configuración. La lógica de negocio se implementa en **Java puro**, siguiendo el paradigma de **Programación Orientada a Objetos** y los **principios SOLID**.
+La interfaz se implementó en tres etapas incrementales — terminal, `JOptionPane` y Swing (con FlatLaf) — y finalmente en **JavaFX**, que quedó como la interfaz definitiva del proyecto (ver nota al final de esta sección). La lógica de negocio se implementa en **Java puro**, siguiendo el paradigma de **Programación Orientada a Objetos** y los **principios SOLID**.
+
+> **Nota (post-alcance original):** el enunciado permitía explícitamente Swing/JOptionPane y excluía JavaFX por el costo de configuración adicional (sección 9.2 original). Una vez armado el proyecto, se decidió agregar JavaFX igual, como mejora de experiencia de usuario, ya con la lógica de negocio (Épicas 1 a 3) completamente implementada y probada — el costo de configuración ya no era un riesgo para cumplir el plazo. La sección 9.2 se actualizó para reflejar esta decisión; el resto del documento (épicas, requisitos, estructuras de datos) no cambió.
 
 La gestión de datos en memoria se realiza con estructuras **`Map` / `HashMap`** como almacén principal, y con la interfaz **`Queue`** (implementada mediante `PriorityQueue`) como mecanismo de ordenamiento por prioridad de las tareas.
 
@@ -242,13 +244,12 @@ Map<Prioridad, Queue<Tarea>> colasPorPrioridad = new HashMap<>();
 * **Estados:** Por realizar, En proceso y Finalizada.
 * **Visualización:** listado general, tareas por usuario ordenadas por prioridad, tareas por estado y tareas por prioridad.
 * **Estructuras:** `Map`, `HashMap` y `Queue` / `PriorityQueue`.
-* **Tecnología:** Java, Swing / JOptionPane, Git, GitHub y Conventional Commits.
+* **Tecnología:** Java, JavaFX (interfaz definitiva; se pasó por terminal, JOptionPane y Swing/FlatLaf en el camino), Git, GitHub y Conventional Commits.
 
 ### 9.2 Fuera del alcance
 
 Para mantener el proyecto dentro de los 2 días disponibles, no se incluirán:
 
-* **JavaFX** (requiere SDK, módulos y FXML adicionales; se sustituye por Swing/JOptionPane, opción permitida por el enunciado).
 * **Persistencia obligatoria en JSON** (requiere librería externa tipo Gson/Jackson; queda como funcionalidad opcional).
 * Integración con APIs externas de Jira o Trello.
 * Aplicación móvil.
