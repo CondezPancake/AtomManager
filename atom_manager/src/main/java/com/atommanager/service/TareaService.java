@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Reglas de negocio de la Épica 2 (HU-04 a HU-07), HU-03 (Épica 1) y
@@ -27,16 +26,15 @@ public class TareaService {
 
     private final TareaRepository tareaRepository;
     private final UsuarioRepository usuarioRepository;
-    private final AtomicInteger contadorId = new AtomicInteger(0);
 
     public TareaService(TareaRepository tareaRepository, UsuarioRepository usuarioRepository) {
         this.tareaRepository = tareaRepository;
         this.usuarioRepository = usuarioRepository;
     }
 
-    /** HU-04: crea una tarea con id único autogenerado; el título obligatorio lo valida {@link Tarea}. */
+    /** HU-04: crea una tarea con id numérico autogenerado ("01", "02"...), sin duplicados ni saltos; el título obligatorio lo valida {@link Tarea}. */
     public Tarea crearTarea(String titulo, String descripcion, Prioridad prioridad) {
-        String id = "T-" + contadorId.incrementAndGet();
+        String id = GeneradorId.siguiente(tareaRepository.listarTodas().stream().map(Tarea::getId).toList());
         Tarea tarea = new Tarea(id, titulo, descripcion, prioridad);
         tareaRepository.guardar(tarea);
         return tarea;
@@ -68,9 +66,11 @@ public class TareaService {
         tareaRepository.eliminar(tareaId);
     }
 
-    /** HU-07: lista todas las tareas registradas. */
+    /** HU-07: lista todas las tareas registradas, ordenadas por id. */
     public List<Tarea> listarTareas() {
-        return tareaRepository.listarTodas();
+        return tareaRepository.listarTodas().stream()
+                .sorted(Comparator.comparingInt(t -> Integer.parseInt(t.getId())))
+                .toList();
     }
 
     /** HU-09: agrupa las tareas por estado para la vista tipo tablero. */
@@ -92,9 +92,11 @@ public class TareaService {
         return ordenarPorPrioridad(tareaRepository.listarTodas());
     }
 
+    /** Ordena por prioridad (Alta → Moderada → Baja) y, entre tareas con la misma prioridad, por id. */
     private List<Tarea> ordenarPorPrioridad(List<Tarea> tareas) {
         Queue<Tarea> cola = new PriorityQueue<>(
-                Comparator.comparingInt(tarea -> tarea.getPrioridad().getPeso())
+                Comparator.comparingInt((Tarea tarea) -> tarea.getPrioridad().getPeso())
+                        .thenComparingInt(tarea -> Integer.parseInt(tarea.getId()))
         );
         cola.addAll(tareas);
 

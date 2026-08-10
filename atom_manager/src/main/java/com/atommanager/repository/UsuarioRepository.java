@@ -18,4 +18,7 @@ public interface UsuarioRepository {
     List<Usuario> listarTodos();
 
     boolean existe(String id);
+
+    /** Elimina el usuario con ese id, si existe. Si no existe, no hace nada. */
+    void eliminar(String id);
 }

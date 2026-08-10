@@ -40,6 +40,47 @@ class UsuarioServiceTest {
     }
 
     @Test
+    void registrarUsuario_generaIdsConFormatoNumericoConsecutivo() {
+        Usuario u1 = usuarioService.registrarUsuario("Ana");
+        Usuario u2 = usuarioService.registrarUsuario("Beto");
+        Usuario u3 = usuarioService.registrarUsuario("Cami");
+
+        assertEquals("01", u1.getId());
+        assertEquals("02", u2.getId());
+        assertEquals("03", u3.getId());
+    }
+
+    @Test
+    void registrarUsuario_conIdManualLetrasOSimbolos_lanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class, () -> new Usuario("U-1", "Ana"));
+        assertThrows(IllegalArgumentException.class, () -> new Usuario("abc", "Ana"));
+    }
+
+    @Test
+    void eliminarUsuario_despuesDeBorrarElUltimo_elSiguienteIdReocupaEseLugar() {
+        usuarioService.registrarUsuario("Ana");
+        Usuario u2 = usuarioService.registrarUsuario("Beto");
+
+        usuarioService.eliminarUsuario(u2.getId());
+        Usuario u3 = usuarioService.registrarUsuario("Cami");
+
+        assertEquals("02", u3.getId());
+    }
+
+    @Test
+    void eliminarUsuario_delMedio_noProvocaSaltosArtificialesNiDuplicados() {
+        usuarioService.registrarUsuario("Ana");
+        Usuario u2 = usuarioService.registrarUsuario("Beto");
+        Usuario u3 = usuarioService.registrarUsuario("Cami");
+
+        usuarioService.eliminarUsuario(u2.getId());
+        Usuario u4 = usuarioService.registrarUsuario("Dani");
+
+        assertEquals("04", u4.getId());
+        assertNotEquals(u3.getId(), u4.getId());
+    }
+
+    @Test
     void registrarUsuario_conNombreValido_loGuarda() {
         Usuario usuario = usuarioService.registrarUsuario("Ana María");
 
@@ -77,5 +118,36 @@ class UsuarioServiceTest {
     @Test
     void listarUsuarios_sinRegistrosDevuelveListaVacia() {
         assertTrue(usuarioService.listarUsuarios().isEmpty());
+    }
+
+    @Test
+    void listarUsuarios_losDevuelveOrdenadosPorId() {
+        Usuario ana = usuarioService.registrarUsuario("Ana");
+        Usuario beto = usuarioService.registrarUsuario("Beto");
+        Usuario cami = usuarioService.registrarUsuario("Cami");
+
+        usuarioService.eliminarUsuario(beto.getId());
+        Usuario dani = usuarioService.registrarUsuario("Dani");
+
+        assertEquals(List.of(ana, cami, dani), usuarioService.listarUsuarios());
+    }
+
+    @Test
+    void eliminarUsuario_loSacaDelListadoYNoReapareceAlConsultar() {
+        Usuario ana = usuarioService.registrarUsuario("Ana");
+        usuarioService.registrarUsuario("Beto");
+
+        usuarioService.eliminarUsuario(ana.getId());
+
+        assertEquals(1, usuarioService.listarUsuarios().size());
+        assertTrue(usuarioService.listarUsuarios().stream().noneMatch(u -> u.getId().equals(ana.getId())));
+        // se consulta de nuevo para confirmar que no "reaparece" en un refresco posterior
+        assertTrue(usuarioService.listarUsuarios().stream().noneMatch(u -> u.getId().equals(ana.getId())));
+    }
+
+    @Test
+    void eliminarUsuario_conIdInexistente_lanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.eliminarUsuario("no-existe"));
     }
 }

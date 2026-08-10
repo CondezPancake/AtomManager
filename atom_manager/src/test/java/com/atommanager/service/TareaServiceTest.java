@@ -51,6 +51,28 @@ class TareaServiceTest {
     }
 
     @Test
+    void crearTarea_generaIdsConFormatoNumericoConsecutivo() {
+        Tarea t1 = tareaService.crearTarea("Tarea 1", "desc", Prioridad.ALTA);
+        Tarea t2 = tareaService.crearTarea("Tarea 2", "desc", Prioridad.ALTA);
+        Tarea t3 = tareaService.crearTarea("Tarea 3", "desc", Prioridad.ALTA);
+
+        assertEquals("01", t1.getId());
+        assertEquals("02", t2.getId());
+        assertEquals("03", t3.getId());
+    }
+
+    @Test
+    void eliminarTarea_despuesDeBorrarLaUltima_laSiguienteIdReocupaEseLugar() {
+        tareaService.crearTarea("Tarea 1", "desc", Prioridad.ALTA);
+        Tarea t2 = tareaService.crearTarea("Tarea 2", "desc", Prioridad.ALTA);
+
+        tareaService.eliminarTarea(t2.getId());
+        Tarea t3 = tareaService.crearTarea("Tarea 3", "desc", Prioridad.ALTA);
+
+        assertEquals("02", t3.getId());
+    }
+
+    @Test
     void crearTarea_sinTitulo_lanzaExcepcion() {
         assertThrows(IllegalArgumentException.class,
                 () -> tareaService.crearTarea("  ", "desc", Prioridad.ALTA));
@@ -124,6 +146,17 @@ class TareaServiceTest {
     }
 
     @Test
+    void listarTareas_lasDevuelveOrdenadasPorId() {
+        Tarea t1 = tareaService.crearTarea("Tarea 1", "desc", Prioridad.BAJA);
+        Tarea t2 = tareaService.crearTarea("Tarea 2", "desc", Prioridad.ALTA);
+
+        tareaService.eliminarTarea(t1.getId());
+        Tarea t3 = tareaService.crearTarea("Tarea 3", "desc", Prioridad.MODERADA);
+
+        assertEquals(List.of(t2, t3), tareaService.listarTareas());
+    }
+
+    @Test
     void tareasPorEstado_lasAgrupaEnLasTresColumnas() {
         Tarea porRealizar = tareaService.crearTarea("Por realizar", "desc", Prioridad.BAJA);
         Tarea enProceso = tareaService.crearTarea("En proceso", "desc", Prioridad.MODERADA);
@@ -178,6 +211,16 @@ class TareaServiceTest {
         List<Tarea> ordenadas = tareaService.tareasPorPrioridad();
 
         assertEquals(List.of(alta, moderada, baja), ordenadas);
+    }
+
+    @Test
+    void tareasPorPrioridad_general_entreMismaPrioridad_desempataPorId() {
+        Tarea primeraAlta = tareaService.crearTarea("Primera alta", "desc", Prioridad.ALTA);
+        Tarea segundaAlta = tareaService.crearTarea("Segunda alta", "desc", Prioridad.ALTA);
+
+        List<Tarea> ordenadas = tareaService.tareasPorPrioridad();
+
+        assertEquals(List.of(primeraAlta, segundaAlta), ordenadas);
     }
 
     @Test

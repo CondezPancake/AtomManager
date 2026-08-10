@@ -34,4 +34,9 @@ public class UsuarioRepositoryMemoria implements UsuarioRepository {
     public boolean existe(String id) {
         return usuarios.containsKey(id);
     }
+
+    @Override
+    public void eliminar(String id) {
+        usuarios.remove(id);
+    }
 }

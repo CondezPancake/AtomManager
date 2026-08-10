@@ -41,7 +41,7 @@ public class VistaUsuarios {
         Label titulo = new Label("Usuarios");
         titulo.getStyleClass().add("titulo-seccion");
 
-        VBox contenido = new VBox(12, titulo, formularioAlta(), tabla);
+        VBox contenido = new VBox(12, titulo, formularioAlta(), tabla, panelAcciones());
         contenido.setPadding(new Insets(16));
 
         actualizarTabla();
@@ -66,6 +66,30 @@ public class VistaUsuarios {
         formulario.setAlignment(Pos.CENTER_LEFT);
         formulario.getStyleClass().add("form-panel");
         return formulario;
+    }
+
+    private HBox panelAcciones() {
+        Button botonEliminar = new Button("Eliminar usuario seleccionado");
+        botonEliminar.setOnAction(e -> Dialogos.ejecutar(() -> {
+            Usuario usuario = usuarioSeleccionadoOLanzar();
+            if (Dialogos.confirmar("¿Eliminar al usuario \"" + usuario.getNombre() + "\" (" + usuario.getId() + ")? Esta acción no se puede deshacer.")) {
+                usuarioService.eliminarUsuario(usuario.getId());
+                actualizarTabla();
+            }
+        }));
+
+        HBox panel = new HBox(botonEliminar);
+        panel.setAlignment(Pos.CENTER_LEFT);
+        panel.getStyleClass().add("form-panel");
+        return panel;
+    }
+
+    private Usuario usuarioSeleccionadoOLanzar() {
+        Usuario usuario = tabla.getSelectionModel().getSelectedItem();
+        if (usuario == null) {
+            throw new IllegalArgumentException("Seleccioná un usuario de la tabla primero.");
+        }
+        return usuario;
     }
 
     private void configurarTabla() {

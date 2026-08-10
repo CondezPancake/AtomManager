@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  */
 public class Usuario {
 
-    private static final Pattern ID_VALIDO = Pattern.compile("^U-\\d+$");
+    private static final Pattern ID_VALIDO = Pattern.compile("^\\d+$");
     private static final Pattern NOMBRE_VALIDO = Pattern.compile("^[\\p{L} '-]+$");
 
     private final String id;
@@ -21,7 +21,7 @@ public class Usuario {
         }
         if (!ID_VALIDO.matcher(id).matches()) {
             throw new IllegalArgumentException(
-                    "El id del usuario no tiene un formato válido (esperado \"U-<número>\", por ejemplo \"U-1\").");
+                    "El id del usuario no tiene un formato válido (esperado solo números, por ejemplo \"01\").");
         }
         validarNombre(nombre);
         this.id = id;
