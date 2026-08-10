@@ -150,7 +150,7 @@ public class VistaTareas {
         Button botonPorUsuario = new Button("Ver tareas de este usuario (por prioridad)");
         botonPorUsuario.setOnAction(e -> Dialogos.ejecutar(() ->
                 Dialogos.mostrarInfo("Tareas de " + campoUsuarioId.getText(),
-                        formatearListado(tareaService.tareasPorPrioridad(campoUsuarioId.getText())))));
+                        formatearListadoConDescripcion(tareaService.tareasPorPrioridad(campoUsuarioId.getText())))));
 
         Button botonTablero = new Button("Ver tablero por estado");
         botonTablero.setOnAction(e -> Dialogos.ejecutar(() ->
@@ -227,6 +227,22 @@ public class VistaTareas {
         StringBuilder texto = new StringBuilder();
         for (Tarea tarea : tareas) {
             texto.append(tarea).append("\n");
+        }
+        return texto.toString();
+    }
+
+    /** Igual que {@link #formatearListado}, pero agregando la descripción de cada tarea (para la consulta por usuario). */
+    private String formatearListadoConDescripcion(List<Tarea> tareas) {
+        if (tareas.isEmpty()) {
+            return "No hay tareas para mostrar.";
+        }
+        StringBuilder texto = new StringBuilder();
+        for (Tarea tarea : tareas) {
+            String descripcion = tarea.getDescripcion();
+            texto.append(tarea).append("\n")
+                    .append("    Descripción: ")
+                    .append(descripcion == null || descripcion.isBlank() ? "(sin descripción)" : descripcion)
+                    .append("\n");
         }
         return texto.toString();
     }
