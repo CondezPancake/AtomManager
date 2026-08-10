@@ -265,7 +265,7 @@ atom_manager/
 └── README.md
 ```
 
-## Documentación
+## Documentación.
 
 - [`docs/AtomManager2.1.md`](docs/AtomManager2.1.md): documento de diseño completo (épicas, historias de usuario, requisitos funcionales y no funcionales).
 - [`docs/cambios.md`](docs/cambios.md): registro cronológico de los cambios realizados en el proyecto.
