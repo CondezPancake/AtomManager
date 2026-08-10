@@ -25,4 +25,7 @@ public interface TareaRepository {
     List<Tarea> buscarPorEstado(Estado estado);
 
     boolean existe(String id);
+
+    /** Elimina la tarea con ese id, si existe. Si no existe, no hace nada. */
+    void eliminar(String id);
 }

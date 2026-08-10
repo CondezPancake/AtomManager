@@ -1,12 +1,16 @@
 package com.atommanager.model;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * Integrante del proyecto (HU-01, HU-02). Clase de datos: sin lógica de
  * negocio, solo encapsulamiento y validación de sus propios invariantes.
  */
 public class Usuario {
+
+    private static final Pattern ID_VALIDO = Pattern.compile("^U-\\d+$");
+    private static final Pattern NOMBRE_VALIDO = Pattern.compile("^[\\p{L} '-]+$");
 
     private final String id;
     private String nombre;
@@ -15,9 +19,11 @@ public class Usuario {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("El id del usuario es obligatorio.");
         }
-        if (nombre == null || nombre.isBlank()) {
-            throw new IllegalArgumentException("El nombre del usuario es obligatorio.");
+        if (!ID_VALIDO.matcher(id).matches()) {
+            throw new IllegalArgumentException(
+                    "El id del usuario no tiene un formato válido (esperado \"U-<número>\", por ejemplo \"U-1\").");
         }
+        validarNombre(nombre);
         this.id = id;
         this.nombre = nombre;
     }
@@ -31,10 +37,18 @@ public class Usuario {
     }
 
     public void setNombre(String nombre) {
+        validarNombre(nombre);
+        this.nombre = nombre;
+    }
+
+    private static void validarNombre(String nombre) {
         if (nombre == null || nombre.isBlank()) {
             throw new IllegalArgumentException("El nombre del usuario es obligatorio.");
         }
-        this.nombre = nombre;
+        if (!NOMBRE_VALIDO.matcher(nombre).matches()) {
+            throw new IllegalArgumentException(
+                    "El nombre del usuario solo puede tener letras, espacios, guiones y apóstrofos (sin números ni otros símbolos).");
+        }
     }
 
     @Override

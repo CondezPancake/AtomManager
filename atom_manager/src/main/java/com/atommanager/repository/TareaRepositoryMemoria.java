@@ -51,4 +51,9 @@ public class TareaRepositoryMemoria implements TareaRepository {
     public boolean existe(String id) {
         return tareas.containsKey(id);
     }
+
+    @Override
+    public void eliminar(String id) {
+        tareas.remove(id);
+    }
 }

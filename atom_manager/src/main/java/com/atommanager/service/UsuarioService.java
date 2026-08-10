@@ -4,6 +4,7 @@ import com.atommanager.model.Usuario;
 import com.atommanager.repository.UsuarioRepository;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Reglas de negocio de la Épica 1 (HU-01, HU-02). Recibe su repositorio
@@ -13,16 +14,15 @@ import java.util.List;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final AtomicInteger contadorId = new AtomicInteger(0);
 
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
 
-    /** HU-01: registra un usuario; el id debe ser único. */
-    public Usuario registrarUsuario(String id, String nombre) {
-        if (usuarioRepository.existe(id)) {
-            throw new IllegalArgumentException("Ya existe un usuario con el id \"" + id + "\".");
-        }
+    /** HU-01: registra un usuario con id único autogenerado (mismo esquema que {@code TareaService.crearTarea}). */
+    public Usuario registrarUsuario(String nombre) {
+        String id = "U-" + contadorId.incrementAndGet();
         Usuario usuario = new Usuario(id, nombre);
         usuarioRepository.guardar(usuario);
         return usuario;

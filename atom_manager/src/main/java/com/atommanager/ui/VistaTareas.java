@@ -124,11 +124,21 @@ public class VistaTareas {
             actualizarTabla();
         }));
 
+        Button botonEliminar = new Button("Eliminar");
+        botonEliminar.setOnAction(e -> Dialogos.ejecutar(() -> {
+            Tarea tarea = tareaSeleccionadaOLanzar();
+            if (Dialogos.confirmar("¿Eliminar la tarea \"" + tarea.getTitulo() + "\" (" + tarea.getId() + ")? Esta acción no se puede deshacer.")) {
+                tareaService.eliminarTarea(tarea.getId());
+                actualizarTabla();
+            }
+        }));
+
         HBox panel = new HBox(10,
                 new Label("Sobre la tarea seleccionada en la tabla —"),
                 new Label("Usuario:"), campoUsuarioId, botonAsignar,
                 new Label("Prioridad:"), comboPrioridad, botonPrioridad,
-                new Label("Estado:"), comboEstado, botonEstado);
+                new Label("Estado:"), comboEstado, botonEstado,
+                botonEliminar);
         panel.setAlignment(Pos.CENTER_LEFT);
         panel.getStyleClass().add("form-panel");
         return panel;
@@ -202,10 +212,12 @@ public class VistaTareas {
         tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
+    /** Recarga la tabla ya ordenada de mayor a menor prioridad (se mantiene así tras cualquier refresco). */
     private void actualizarTabla() {
-        List<Tarea> tareas = tareaService.listarTareas();
+        List<Tarea> tareas = tareaService.tareasPorPrioridad();
         ObservableList<Tarea> datos = FXCollections.observableArrayList(tareas);
         tabla.setItems(datos);
+        tabla.refresh();
     }
 
     private String formatearListado(List<Tarea> tareas) {

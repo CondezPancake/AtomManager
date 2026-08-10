@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -27,26 +29,45 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void registrarUsuario_loGuardaConIdUnico() {
-        Usuario usuario = usuarioService.registrarUsuario("u1", "Ana");
+    void registrarUsuario_generaIdUnicoAutomaticamente() {
+        Usuario u1 = usuarioService.registrarUsuario("Ana");
+        Usuario u2 = usuarioService.registrarUsuario("Beto");
 
-        assertEquals("u1", usuario.getId());
-        assertEquals("Ana", usuario.getNombre());
-        assertTrue(usuarioRepository.existe("u1"));
+        assertNotNull(u1.getId());
+        assertNotNull(u2.getId());
+        assertNotEquals(u1.getId(), u2.getId());
+        assertTrue(usuarioRepository.existe(u1.getId()));
     }
 
     @Test
-    void registrarUsuario_conIdDuplicado_lanzaExcepcion() {
-        usuarioService.registrarUsuario("u1", "Ana");
+    void registrarUsuario_conNombreValido_loGuarda() {
+        Usuario usuario = usuarioService.registrarUsuario("Ana María");
 
+        assertEquals("Ana María", usuario.getNombre());
+    }
+
+    @Test
+    void registrarUsuario_conNumerosEnElNombre_lanzaExcepcion() {
         assertThrows(IllegalArgumentException.class,
-                () -> usuarioService.registrarUsuario("u1", "Otro"));
+                () -> usuarioService.registrarUsuario("Ana123"));
+    }
+
+    @Test
+    void registrarUsuario_conSimbolosInvalidosEnElNombre_lanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.registrarUsuario("Ana@Beto"));
+    }
+
+    @Test
+    void registrarUsuario_sinNombre_lanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.registrarUsuario("  "));
     }
 
     @Test
     void listarUsuarios_devuelveTodosLosRegistrados() {
-        usuarioService.registrarUsuario("u1", "Ana");
-        usuarioService.registrarUsuario("u2", "Beto");
+        usuarioService.registrarUsuario("Ana");
+        usuarioService.registrarUsuario("Beto");
 
         List<Usuario> usuarios = usuarioService.listarUsuarios();
 

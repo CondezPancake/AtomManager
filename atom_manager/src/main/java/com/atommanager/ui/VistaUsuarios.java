@@ -52,20 +52,17 @@ public class VistaUsuarios {
     }
 
     private HBox formularioAlta() {
-        TextField campoId = new TextField();
-        campoId.setPromptText("ID");
         TextField campoNombre = new TextField();
         campoNombre.setPromptText("Nombre");
 
         Button botonRegistrar = new Button("Registrar usuario");
         botonRegistrar.setOnAction(e -> Dialogos.ejecutar(() -> {
-            usuarioService.registrarUsuario(campoId.getText(), campoNombre.getText());
-            campoId.clear();
+            usuarioService.registrarUsuario(campoNombre.getText());
             campoNombre.clear();
             actualizarTabla();
         }));
 
-        HBox formulario = new HBox(10, new Label("ID:"), campoId, new Label("Nombre:"), campoNombre, botonRegistrar);
+        HBox formulario = new HBox(10, new Label("Nombre:"), campoNombre, botonRegistrar);
         formulario.setAlignment(Pos.CENTER_LEFT);
         formulario.getStyleClass().add("form-panel");
         return formulario;
@@ -87,5 +84,6 @@ public class VistaUsuarios {
         List<Usuario> usuarios = usuarioService.listarUsuarios();
         ObservableList<Usuario> datos = FXCollections.observableArrayList(usuarios);
         tabla.setItems(datos);
+        tabla.refresh();
     }
 }

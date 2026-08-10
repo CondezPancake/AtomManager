@@ -62,6 +62,12 @@ public class TareaService {
         obtenerTareaOLanzar(tareaId).setEstado(estado);
     }
 
+    /** Elimina una tarea existente; valida que exista antes de borrarla. */
+    public void eliminarTarea(String tareaId) {
+        obtenerTareaOLanzar(tareaId);
+        tareaRepository.eliminar(tareaId);
+    }
+
     /** HU-07: lista todas las tareas registradas. */
     public List<Tarea> listarTareas() {
         return tareaRepository.listarTodas();

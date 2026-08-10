@@ -3,6 +3,7 @@ package com.atommanager.service;
 import com.atommanager.model.Estado;
 import com.atommanager.model.Prioridad;
 import com.atommanager.model.Tarea;
+import com.atommanager.model.Usuario;
 import com.atommanager.repository.TareaRepository;
 import com.atommanager.repository.TareaRepositoryMemoria;
 import com.atommanager.repository.UsuarioRepository;
@@ -58,11 +59,11 @@ class TareaServiceTest {
     @Test
     void asignarTarea_aUsuarioExistente_laAsigna() {
         Tarea tarea = tareaService.crearTarea("Tarea 1", "desc", Prioridad.MODERADA);
-        usuarioService.registrarUsuario("u1", "Ana");
+        Usuario ana = usuarioService.registrarUsuario("Ana");
 
-        tareaService.asignarTarea(tarea.getId(), "u1");
+        tareaService.asignarTarea(tarea.getId(), ana.getId());
 
-        assertEquals("u1", tarea.getResponsable().getId());
+        assertEquals(ana.getId(), tarea.getResponsable().getId());
     }
 
     @Test
@@ -75,10 +76,10 @@ class TareaServiceTest {
 
     @Test
     void asignarTarea_conIdDeTareaInexistente_lanzaExcepcion() {
-        usuarioService.registrarUsuario("u1", "Ana");
+        Usuario ana = usuarioService.registrarUsuario("Ana");
 
         assertThrows(IllegalArgumentException.class,
-                () -> tareaService.asignarTarea("no-existe", "u1"));
+                () -> tareaService.asignarTarea("no-existe", ana.getId()));
     }
 
     @Test
@@ -150,15 +151,15 @@ class TareaServiceTest {
 
     @Test
     void tareasPorPrioridad_lasOrdenaDeAltaABaja() {
-        usuarioService.registrarUsuario("u1", "Ana");
+        Usuario ana = usuarioService.registrarUsuario("Ana");
         Tarea baja = tareaService.crearTarea("Baja", "desc", Prioridad.BAJA);
         Tarea alta = tareaService.crearTarea("Alta", "desc", Prioridad.ALTA);
         Tarea moderada = tareaService.crearTarea("Moderada", "desc", Prioridad.MODERADA);
-        tareaService.asignarTarea(baja.getId(), "u1");
-        tareaService.asignarTarea(alta.getId(), "u1");
-        tareaService.asignarTarea(moderada.getId(), "u1");
+        tareaService.asignarTarea(baja.getId(), ana.getId());
+        tareaService.asignarTarea(alta.getId(), ana.getId());
+        tareaService.asignarTarea(moderada.getId(), ana.getId());
 
-        List<Tarea> ordenadas = tareaService.tareasPorPrioridad("u1");
+        List<Tarea> ordenadas = tareaService.tareasPorPrioridad(ana.getId());
 
         assertEquals(List.of(alta, moderada, baja), ordenadas);
     }
@@ -182,5 +183,48 @@ class TareaServiceTest {
     @Test
     void tareasPorPrioridad_general_sinTareas_devuelveListaVacia() {
         assertTrue(tareaService.tareasPorPrioridad().isEmpty());
+    }
+
+    @Test
+    void asignarTarea_reasignarAOtroUsuario_dejaSoloAlNuevoResponsable() {
+        Usuario ana = usuarioService.registrarUsuario("Ana");
+        Usuario beto = usuarioService.registrarUsuario("Beto");
+        Tarea tarea = tareaService.crearTarea("Tarea 1", "desc", Prioridad.ALTA);
+
+        tareaService.asignarTarea(tarea.getId(), ana.getId());
+        tareaService.asignarTarea(tarea.getId(), beto.getId());
+
+        assertEquals(beto.getId(), tarea.getResponsable().getId());
+        assertTrue(tareaService.tareasPorPrioridad(ana.getId()).isEmpty());
+        assertEquals(List.of(tarea), tareaService.tareasPorPrioridad(beto.getId()));
+    }
+
+    @Test
+    void eliminarTarea_laSacaDelListadoYDeLasConsultas() {
+        Usuario ana = usuarioService.registrarUsuario("Ana");
+        Tarea tarea = tareaService.crearTarea("Tarea 1", "desc", Prioridad.ALTA);
+        tareaService.asignarTarea(tarea.getId(), ana.getId());
+
+        tareaService.eliminarTarea(tarea.getId());
+
+        assertTrue(tareaService.listarTareas().isEmpty());
+        assertTrue(tareaService.tareasPorPrioridad(ana.getId()).isEmpty());
+        assertTrue(tareaService.tareasPorEstado().get(Estado.POR_REALIZAR).isEmpty());
+    }
+
+    @Test
+    void eliminarTarea_noAfectaOtrasTareas() {
+        Tarea aBorrar = tareaService.crearTarea("Borrar", "desc", Prioridad.BAJA);
+        Tarea aConservar = tareaService.crearTarea("Conservar", "desc", Prioridad.ALTA);
+
+        tareaService.eliminarTarea(aBorrar.getId());
+
+        assertEquals(List.of(aConservar), tareaService.listarTareas());
+    }
+
+    @Test
+    void eliminarTarea_conIdInexistente_lanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class,
+                () -> tareaService.eliminarTarea("no-existe"));
     }
 }
